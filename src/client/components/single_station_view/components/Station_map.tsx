@@ -1,6 +1,6 @@
 import { EuiLoadingSpinner, EuiPanel } from "@elastic/eui"
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet"
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { FC } from "react"
 import { Stored_station_data } from "src/common"
 
