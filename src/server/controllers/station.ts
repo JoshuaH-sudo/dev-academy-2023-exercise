@@ -265,7 +265,10 @@ export const get_station_stats = async (
     station.station_id,
     time_filter
   )
-  const average_distance_ended = await get_average_distance_ended(station.station_id, time_filter)
+  const average_distance_ended = await get_average_distance_ended(
+    station.station_id,
+    time_filter
+  )
 
   const top_5_return_stations = await get_top_5_return_stations(
     station.station_id,

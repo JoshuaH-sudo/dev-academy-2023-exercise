@@ -19,6 +19,7 @@ import {
   Station_query_result,
 } from "../../server/controllers/station"
 import Single_station_view from "./single_station_view/Single_station_view"
+import use_api from "../hooks/use_api"
 
 const Station_view = () => {
   const [is_loading, set_is_loading] = useState(false)
@@ -34,6 +35,7 @@ const Station_view = () => {
     pageSizeOptions: [10, 25, 50],
     showPerPageOptions: true,
   })
+  const api = use_api()
   const [error, set_error] = useState<string | undefined>(undefined)
 
   const get_station_data = async () => {
@@ -48,16 +50,17 @@ const Station_view = () => {
         sort: sorting.sort.field,
         order: sorting.sort.direction,
       }
-      const response = await axios.get<Station_query_result>("/stations", {
+      const response = await api.get<Station_query_result>("/stations", {
         params,
       })
+
       set_station_data(response.data.stations)
       set_pagination({
         ...pagination,
         totalItemCount: response.data.total_stations,
       })
     } catch (error) {
-      set_error(error as string)
+      if (typeof error === "string") set_error(error)
       console.error(error)
     }
     set_is_loading(false)
@@ -177,7 +180,7 @@ const Station_view = () => {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      
+
       {show_single_station_view && (
         <Single_station_view
           station_doc_id={show_single_station_view}

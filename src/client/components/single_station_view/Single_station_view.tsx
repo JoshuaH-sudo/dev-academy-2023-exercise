@@ -97,7 +97,7 @@ const Single_station_view: FC<Single_station_view_props> = ({
     <EuiFlexGroup direction="column">
       <EuiFlexItem grow={false}>
         <EuiTitle>
-          <h2>Top Popular stations</h2>
+          <h2>Top Popular Stations</h2>
         </EuiTitle>
       </EuiFlexItem>
 

@@ -18,6 +18,20 @@ describe("Station", () => {
     expect(element).toBeInTheDocument()
   })
 
+  it("Displays error message", async () => {
+    server.use(
+      rest.get("http://localhost/stations", (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({ message: "Internal server error" }))
+      })
+    )
+
+    render(<Station_view />)
+
+    await waitFor(() => {
+      expect(screen.getByText("Internal server error")).toBeInTheDocument()
+    })
+  })
+
   it("Sort station data", async () => {
     //Mock the server response for sorting table items
     //This runtime api will be replaced after the test
@@ -103,5 +117,19 @@ describe("Station", () => {
     })
 
     expect(screen.queryByText(dummy_station_B.nimi)).not.toBeInTheDocument()
+  })
+
+  it("Should display single station view when station is clicked", async () => {
+    render(<Station_view />)
+    const element = await screen.findByText(dummy_station_A.nimi)
+    expect(element).toBeInTheDocument()
+
+    act(() => {
+      fireEvent.click(element)
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText("Average Covered Distance")).toBeInTheDocument()
+    })
   })
 })
