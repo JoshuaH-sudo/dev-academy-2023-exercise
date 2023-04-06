@@ -19,6 +19,9 @@ const config: Config = {
     "@testing-library/jest-dom/extend-expect",
     "<rootDir>/test_setup.ts",
   ],
+  snapshotSerializers: [
+    '@emotion/jest/serializer'
+  ],
   testEnvironment: "jsdom",
 }
 

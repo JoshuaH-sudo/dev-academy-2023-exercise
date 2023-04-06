@@ -1,8 +1,7 @@
 import { EuiRangeProps, EuiRange, EuiRangeTick } from "@elastic/eui"
-import { FC, useEffect, useState } from "react"
+import { FC, useState } from "react"
 import use_debounce_handler from "../../../hooks/use_debounce_handler"
 import React from "react"
-import axios from "axios"
 
 interface Time_filter_props {
   set_date_filter: (month: string) => void

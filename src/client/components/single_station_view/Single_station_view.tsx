@@ -172,7 +172,7 @@ const Single_station_view: FC<Single_station_view_props> = ({
 
   return (
     <EuiModal onClose={on_close} style={modal_style}>
-      <EuiModalBody>
+      <EuiModalBody data-testid="single_station_view">
         <EuiFlexGroup style={{ height: "100%" }}>
           <EuiFlexItem grow={true}>{information_section}</EuiFlexItem>
           <EuiFlexItem grow={true} style={{ width: "25%" }}>

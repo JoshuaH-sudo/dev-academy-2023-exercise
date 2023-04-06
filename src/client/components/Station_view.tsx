@@ -12,7 +12,6 @@ import {
   Query,
   SearchFilterConfig,
 } from "@elastic/eui"
-import axios from "axios"
 import { Stored_station_data } from "../../common"
 import {
   Get_stations_query_params,

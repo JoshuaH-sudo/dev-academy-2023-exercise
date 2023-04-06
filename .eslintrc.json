@@ -30,5 +30,7 @@
         "jest-dom/prefer-enabled-disabled": "error",
         "jest-dom/prefer-required": "error",
         "jest-dom/prefer-to-have-attribute": "error",
+
+        "react/no-unknown-property": ["error", { "ignore": ["css"] }]
     }
 }

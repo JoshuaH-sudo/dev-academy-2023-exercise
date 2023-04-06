@@ -2,7 +2,7 @@ import { DefaultBodyType, MockedRequest, rest, RestHandler } from "msw"
 import { setupServer } from "msw/node"
 import { Journey_query_result } from "../server/controllers/journey"
 import { Station_query_result } from "../server/controllers/station"
-import { dummy_journeys, dummy_stations } from "./data"
+import { dummy_journeys, dummy_station_stats, dummy_stations } from "./data"
 
 export const dummy_journey_data: Journey_query_result = {
   journeys: dummy_journeys,
@@ -22,6 +22,12 @@ const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   }),
   rest.get("http://localhost/stations", (req, res, ctx) => {
     return res(ctx.json(dummy_station_data))
+  }),
+  rest.get("http://localhost/stations/1/stats", (req, res, ctx) => {
+    return res(ctx.json(dummy_station_stats))
+  }),
+  rest.get("http://localhost/stations/1", (req, res, ctx) => {
+    return res(ctx.json(dummy_stations[0]))
   }),
 ]
 

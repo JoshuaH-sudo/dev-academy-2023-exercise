@@ -4,7 +4,6 @@ import {
   EuiSpacer,
   EuiListGroup,
   EuiSkeletonText,
-  EuiPanel,
 } from "@elastic/eui"
 import React from "react"
 import { FC } from "react"
