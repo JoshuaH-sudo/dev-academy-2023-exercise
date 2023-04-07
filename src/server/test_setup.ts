@@ -1,9 +1,10 @@
 import mongoose from "mongoose"
 
+
+//Making absolutely sure there is no data in the database before any test
 beforeAll(async () => {
   await connect_to_database()
   await clean_database()
-  await display_collections()
 })
 
 beforeEach(async () => {
@@ -20,16 +21,6 @@ afterAll(async () => {
   await clean_database()
   await disconnect_from_database()
 })
-
-const display_collections = async (): Promise<void> => {
-  //console log all collections
-  const collections = mongoose.connection.collections
-  for (const key in collections) {
-    const collection = collections[key]
-    const documents = await collection.find().toArray()
-    console.log(key, documents)
-  }
-}
 
 const clean_database = () => {
   const collections = mongoose.connection.collections
