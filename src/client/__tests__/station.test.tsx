@@ -176,8 +176,8 @@ describe("Station", () => {
     })
   })
 
-  describe("Single station view", () => {
-    it("Should display single station view when station is clicked", async () => {
+  describe("Station table's station modal", () => {
+    it("Should display station modal when station is clicked", async () => {
       render(<Station_view />)
       const element = await screen.findByText(dummy_station_A.nimi)
       //Click the station

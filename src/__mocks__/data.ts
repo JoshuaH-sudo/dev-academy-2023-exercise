@@ -76,7 +76,7 @@ export const dummy_station_stats: Station_stats = {
   top_5_departure_stations: [dummy_station_A],
   top_5_return_stations: [dummy_station_B],
   total_journeys_started: 1,
-  total_journeys_ended: 1,
+  total_journeys_ended: 2,
   average_distance_started: 1000,
-  average_distance_ended: 1000,
+  average_distance_ended: 2000,
 }

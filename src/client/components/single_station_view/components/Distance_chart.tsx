@@ -1,6 +1,7 @@
 import { Chart, Metric } from "@elastic/charts"
 import { EuiIcon, EuiLoadingSpinner } from "@elastic/eui"
 import React, { FC } from "react"
+import { convert_distance_to_km } from "../../../utils"
 import { Station_stats } from "src/server/controllers/station"
 
 interface Distance_chart_props {
@@ -8,14 +9,6 @@ interface Distance_chart_props {
 }
 
 const Distance_chart: FC<Distance_chart_props> = ({ station_stats }) => {
-  const convert_distance_to_km = (distance: number) => {
-    if (distance < 1000) {
-      return `${distance} m`
-    } else {
-      return `${(distance / 1000).toFixed(2)} km`
-    }
-  }
-
   return (
     <Chart>
       <Metric
@@ -54,5 +47,4 @@ const Distance_chart: FC<Distance_chart_props> = ({ station_stats }) => {
     </Chart>
   )
 }
-
 export default Distance_chart
