@@ -180,9 +180,6 @@ describe("Station", () => {
     it("Should display single station view when station is clicked", async () => {
       render(<Station_view />)
       const element = await screen.findByText(dummy_station_A.nimi)
-      expect(element).toBeInTheDocument()
-      console.log(element)
-
       //Click the station
       act(() => {
         fireEvent.click(element)

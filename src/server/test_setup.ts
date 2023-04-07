@@ -2,30 +2,52 @@ import mongoose from "mongoose"
 
 beforeAll(async () => {
   await connect_to_database()
+  await clean_database()
+  await display_collections()
+})
+
+beforeEach(async () => {
+  await clean_database()
+  jest.restoreAllMocks()
 })
 
 afterEach(async () => {
-  //Clear all collections
-  const collections = mongoose.connection.collections
-
-  for (const key in collections) {
-    const collection = collections[key]
-    await collection.deleteMany({})
-  }
-  // Reset any runtime handlers tests may use.
+  await clean_database()
   jest.restoreAllMocks()
 })
 
 afterAll(async () => {
+  await clean_database()
   await disconnect_from_database()
 })
 
-export const connect_to_database = async (): Promise<void> => {
-  //@ts-ignore mongo uri is provided by jest-mongodb
-  await mongoose.connect(globalThis.__MONGO_URI__)
+const display_collections = async (): Promise<void> => {
+  //console log all collections
+  const collections = mongoose.connection.collections
+  for (const key in collections) {
+    const collection = collections[key]
+    const documents = await collection.find().toArray()
+    console.log(key, documents)
+  }
 }
 
-export const disconnect_from_database = async (): Promise<void> => {
+const clean_database = () => {
+  const collections = mongoose.connection.collections
 
-  await mongoose.connection.close()
+  const promises = []
+  for (const key in collections) {
+    const collection = collections[key]
+    promises.push(collection.deleteMany({}))
+  }
+
+  return Promise.all(promises)
+}
+
+export const connect_to_database = (): Promise<void> => {
+  //@ts-ignore mongo uri is provided by jest-mongodb
+  return mongoose.connect(globalThis.__MONGO_URI__)
+}
+
+export const disconnect_from_database = (): Promise<void> => {
+  return mongoose.connection.close()
 }

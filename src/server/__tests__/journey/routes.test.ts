@@ -8,11 +8,11 @@ import Journey from "../../models/journey"
 describe("Journey Routes", () => {
   it("Should return 200 when getting journeys", async () => {
     //store journey data without _id
-    const new_journey = { ...dummy_journey_A, _id: undefined }
-    await save_journey_data(new_journey)
+    const new_journey = { ...dummy_journey_A, _id: undefined}
+    const stored_journey = await save_journey_data(new_journey)
 
     const saved_journey = await Journey.findOne({
-      _id: new_journey._id,
+      _id: stored_journey._id,
     })
 
     expect(saved_journey).toBeDefined()

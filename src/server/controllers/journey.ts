@@ -114,7 +114,7 @@ export function read_csv_journey_data(filePath: string): Promise<void> {
   })
 }
 
-export async function save_journey_data(data: Journey_data) {
+export function save_journey_data(data: Journey_data) {
   const new_journey = new Journey(data)
   return new_journey.save()
 }

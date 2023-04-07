@@ -117,9 +117,9 @@ export function read_csv_station_data(filePath: string): Promise<void> {
   })
 }
 
-export async function save_station_data(data: Station_data) {
+export function save_station_data(data: Station_data) {
   const new_station = new Station(data)
-  await new_station.save()
+  return new_station.save()
 }
 
 export interface Station_query_result {
