@@ -9,7 +9,7 @@ import {
 } from "@elastic/eui"
 import React from "react"
 import { FC } from "react"
-import { Stored_station_data } from "src/common"
+import { Stored_station_data } from "../../../../common"
 
 interface Title_and_address_props {
   station: Stored_station_data | undefined

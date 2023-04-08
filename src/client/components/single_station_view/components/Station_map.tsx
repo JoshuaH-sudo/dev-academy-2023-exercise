@@ -2,7 +2,7 @@ import { EuiLoadingSpinner, EuiPanel } from "@elastic/eui"
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet"
 import React from "react"
 import { FC } from "react"
-import { Stored_station_data } from "src/common"
+import { Stored_station_data } from "../../../../common"
 
 import "leaflet/dist/leaflet.css"
 import "leaflet/dist/images/marker-icon.png"

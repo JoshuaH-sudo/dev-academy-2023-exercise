@@ -1,6 +1,6 @@
 import moment from "moment"
 import { Stored_journey_data, Stored_station_data } from "../common"
-import { Station_stats } from "src/server/controllers/station"
+import { Station_stats } from "../server/controllers/station"
 
 export const dummy_journey_A: Stored_journey_data = {
   _id: "1",

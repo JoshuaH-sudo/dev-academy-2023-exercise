@@ -98,7 +98,6 @@ describe("Journeys Params and Api", () => {
 
   describe("Journey Api", () => {
     it("Should sort items in desc order correctly", async () => {
-      //have two journeys in the database for these tests
       //@ts-ignore the id is not expected but it is removed
       await save_journey_data({ ...dummy_journey_A, _id: undefined })
       //@ts-ignore
@@ -139,7 +138,6 @@ describe("Journeys Params and Api", () => {
     })
 
     it("Should sort items in asc order correctly", async () => {
-      //have two journeys in the database for these tests
       //@ts-ignore the id is not expected but it is removed
       await save_journey_data({ ...dummy_journey_A, _id: undefined })
       //@ts-ignore

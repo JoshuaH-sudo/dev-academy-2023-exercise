@@ -2,7 +2,7 @@ import { Chart, Metric } from "@elastic/charts"
 import { EuiIcon, EuiLoadingSpinner } from "@elastic/eui"
 import React, { FC } from "react"
 import { convert_distance_to_km } from "../../../utils"
-import { Station_stats } from "src/server/controllers/station"
+import { Station_stats } from "../../../../server/controllers/station"
 
 interface Distance_chart_props {
   station_stats: Station_stats | undefined
@@ -30,7 +30,7 @@ const Distance_chart: FC<Distance_chart_props> = ({ station_stats }) => {
           ],
           [
             {
-              color: "#6ECCB1",
+              color: "#0494FD",
               icon: () =>
                 station_stats ? (
                   <EuiIcon type="arrowLeft" />

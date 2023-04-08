@@ -7,7 +7,7 @@ import {
 } from "@elastic/eui"
 import React from "react"
 import { FC } from "react"
-import { Station_stats } from "src/server/controllers/station"
+import { Station_stats } from "../../../../server/controllers/station"
 
 interface Popular_returns_props {
   station_stats: Station_stats | undefined
