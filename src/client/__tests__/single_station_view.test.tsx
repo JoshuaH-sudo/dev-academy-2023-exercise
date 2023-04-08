@@ -118,17 +118,26 @@ describe("Single station view", () => {
   })
 
   it("Filter by month", async () => {
+    const { findByText } = render(
+      <Single_station_view
+        station_doc_id={station_doc_id}
+        on_close={on_close_mock}
+      />
+    )
+
     server.use(
       //Route to test that the stations are filtered by month
       rest.get(
-        "http://localhost:3000/api/station_stats/:station_doc_id",
+        "http://localhost/stations/:station_doc_id/stats",
         (req, res, ctx) => {
-          const end_date_data = req.url.searchParams.get("start_date")
-          if (!end_date_data) {
+          const start_date_param = req.url.searchParams.get("start_date")
+          console.log(start_date_param)
+          if (!start_date_param) {
             throw new Error("No end date")
           }
-          const month = new Date(end_date_data).getMonth()
-          if (month === 12) {
+          const month = new Date(start_date_param).getMonth()
+          console.log(month)
+          if (month === 11) {
             const new_stats: Station_stats = {
               top_5_return_stations: [],
               top_5_departure_stations: [],
@@ -145,17 +154,12 @@ describe("Single station view", () => {
       )
     )
 
-    const { findByText } = render(
-      <Single_station_view
-        station_doc_id={station_doc_id}
-        on_close={on_close_mock}
-      />
-    )
-
     //check that data is shown in view
-    expect(
-      await findByText(`1. ${dummy_station_stats.top_5_return_stations[0].nimi}`)
+    //check that the chart has been updated
+    const popular_station = await findByText(
+      `1. ${dummy_station_stats.top_5_return_stations[0].nimi}`
     )
+    expect(popular_station)
 
     const december_button = await findByText("Dec")
 
@@ -163,12 +167,9 @@ describe("Single station view", () => {
       december_button.click()
     })
 
-    //check that the chart has been updated
-    const popular_station = await findByText(
-      `1. ${dummy_station_stats.top_5_return_stations[0].nimi}`
-    )
-
-    expect(popular_station).not.toBeInTheDocument()
+    await waitFor(async () => {
+      expect(popular_station).not.toBeInTheDocument()
+    })
   })
 
   //Unable to test chart, does not render all child components

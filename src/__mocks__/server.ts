@@ -23,10 +23,10 @@ const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   rest.get("http://localhost/stations", (req, res, ctx) => {
     return res(ctx.json(dummy_station_data))
   }),
-  rest.get("http://localhost/stations/1/stats", (req, res, ctx) => {
+  rest.get("http://localhost/stations/:station_doc_id/stats", (req, res, ctx) => {
     return res(ctx.json(dummy_station_stats))
   }),
-  rest.get("http://localhost/stations/1", (req, res, ctx) => {
+  rest.get("http://localhost/stations/:station_doc_id", (req, res, ctx) => {
     return res(ctx.json(dummy_stations[0]))
   }),
 ]
