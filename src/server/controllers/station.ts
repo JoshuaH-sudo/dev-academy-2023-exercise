@@ -5,11 +5,7 @@ import { csv_station_schema } from "../models/station"
 import Station from "../models/station"
 import Journey from "../models/journey"
 import { csv_data_is_loaded } from "./config"
-import {
-  Station_csv_data,
-  Station_data,
-  Stored_station_data,
-} from "../../common"
+import { Station_csv_data, Station_data, Stored_station_data } from "../../common"
 import { Request, Response } from "express"
 
 import debug from "debug"
@@ -22,30 +18,20 @@ const csv_files = fs.readdirSync(datasets_path)
 
 //Clear all Stations from the database
 export async function clear_stations() {
-  try {
-    debugLog("Clearing Stations from the database")
-    return Station.deleteMany({})
-  } catch (error) {
-    errorLog("Failed to clear Stations :", error)
-    throw error
-  }
+  debugLog("Clearing Stations from the database")
+  return Station.deleteMany({})
 }
 
 //import all the csv files in the datasets folder to the database
 export async function import_stations_csv_to_database() {
-  try {
-    //loop through all the csv files in the datasets folder
-    for (const file of csv_files) {
-      debugLog(`Importing ${file} to the database`)
-      const csv_file_path = path.join(datasets_path, file)
-      await read_csv_station_data(csv_file_path)
-    }
-    debugLog("All station csv files imported to the database")
-    return csv_data_is_loaded()
-  } catch (error) {
-    errorLog("Failed to import csv datasets to database :", error)
-    throw error
+  //loop through all the csv files in the datasets folder
+  for (const file of csv_files) {
+    debugLog(`Importing ${file} to the database`)
+    const csv_file_path = path.join(datasets_path, file)
+    await read_csv_station_data(csv_file_path)
   }
+  debugLog("All station csv files imported to the database")
+  return csv_data_is_loaded()
 }
 
 export function read_csv_station_data(filePath: string): Promise<void> {
