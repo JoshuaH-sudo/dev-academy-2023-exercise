@@ -173,7 +173,7 @@ export async function get_journeys(
     }
 
     const skip = page * limit
-    const journeys = await Journey.find().skip(skip).limit(limit)
+    const journeys = await Journey.find().skip(skip).limit(limit).lean()
     //sort stations by the given sort parameter manually,
     //as mongoose sort() applies to all documents in the collection,
     //not just the ones that are returned by the query.

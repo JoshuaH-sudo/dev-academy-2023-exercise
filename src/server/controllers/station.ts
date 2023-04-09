@@ -8,15 +8,12 @@ import { csv_data_is_loaded } from "./config"
 import {
   Station_csv_data,
   Station_data,
-  Stored_journey_data,
   Stored_station_data,
 } from "../../common"
 import { Request, Response } from "express"
 
 import debug from "debug"
 import Joi from "joi"
-import { PipelineStage } from "mongoose"
-import moment from "moment"
 const debugLog = debug("app:Station_controller:log")
 const errorLog = debug("app:Station_controller:error")
 
@@ -198,7 +195,7 @@ export async function get_stations(
 
 export const get_station = async (req: Request<{ _id: string }>, res: Response) => {
   try {
-    const station = await Station.findById(req.params._id)
+    const station = await Station.findById(req.params._id).lean()
     if (!station) {
       return res.status(404).json({
         message: "Station not found",
@@ -237,7 +234,7 @@ export const get_station_stats = async (
   const { _id } = req.params
   const time_filter = req.query
 
-  const station = await Station.findById(_id)
+  const station = await Station.findById(_id).lean()
   if (!station || !station.station_id) {
     return res.status(404).json({
       message: "Station not found",
