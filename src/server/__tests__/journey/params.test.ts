@@ -1,6 +1,6 @@
 import { get_journeys, save_journey_data } from "../../controllers/journey"
 import { dummy_journey_A, dummy_journey_B } from "../../../__mocks__/data"
-import journey from "../../models/journey"
+import Journey from "../../models/journey"
 
 //Testing the controller from an internal perspective
 describe("Journeys Params and Api", () => {
@@ -100,9 +100,10 @@ describe("Journeys Params and Api", () => {
     it("Should sort items in desc order correctly", async () => {
       //@ts-ignore the id is not expected but it is removed
       await save_journey_data({ ...dummy_journey_A, _id: undefined })
+
       //@ts-ignore
       await save_journey_data({ ...dummy_journey_B, _id: undefined })
-      const count = await journey.countDocuments()
+      const count = await Journey.countDocuments()
       expect(count).toBe(2)
 
       const mock_request: any = {
@@ -142,7 +143,7 @@ describe("Journeys Params and Api", () => {
       await save_journey_data({ ...dummy_journey_A, _id: undefined })
       //@ts-ignore
       await save_journey_data({ ...dummy_journey_B, _id: undefined })
-      const count = await journey.countDocuments()
+      const count = await Journey.countDocuments()
       expect(count).toBe(2)
 
       const mock_request: any = {
