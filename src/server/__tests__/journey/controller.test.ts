@@ -1,6 +1,5 @@
 import {
   clear_journeys,
-  get_journeys,
   import_journey_csv_to_database,
   read_csv_journey_data,
   save_journey_data,
