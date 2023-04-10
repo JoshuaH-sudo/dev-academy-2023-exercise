@@ -5,12 +5,13 @@
 For explanations and more information, please see the [wiki](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/wiki).
 
 ## Setup
-### Prerequisites
-- Have yarn and docker installed on your machine.
+### Prerequisites: 
+Have yarn and docker installed on your machine.
 
-Install dependencies: `yarn install`
-Start app: `yarn docker`
-Run tests: `yarn test`
+### Scripts
+- Install dependencies: `yarn install`
+- Start app: `yarn docker`
+- Run tests: `yarn test`
 
 ## Features
 - All required and additional requirements of the exercise.
