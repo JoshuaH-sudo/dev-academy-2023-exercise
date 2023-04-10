@@ -2,14 +2,18 @@
 [![CI/CD](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/codecov.yml/badge.svg)](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/codecov.yml)
 [![codecov](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise/branch/main/graph/badge.svg?token=Z1DXOYNLL2)](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise)
 
-## Prerequisites
-- Have docker installed on your machine.
+## Setup
+### Prerequisites
+- Have yarn and docker installed on your machine.
+Install dependencies: `yarn install`
+Start app: `yarn docker`
+Run tests: `yarn test`
 
-## Run App
-`yarn docker`
-
-## Run tests locally
-`yarn test`
+## Index
+[Front-end](src/client/README.md)
+[Front-end Tests](src/client/__tests__/README.md)
+[Back-end](src/server/README.md)
+[Back-end Tests](src/server/__tests__/README.md)
 
 ## Introduction
 My solution for the Solita dev academy 2023 exercise.
