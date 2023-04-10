@@ -5,23 +5,10 @@
 ## Setup
 ### Prerequisites
 - Have yarn and docker installed on your machine.
+
 Install dependencies: `yarn install`
 Start app: `yarn docker`
 Run tests: `yarn test`
-
-## Index
-- [Front-end](src/client/)
-- [Front-end Tests](src/client/__tests__/)
-- [Back-end](src/server/)
-- [Back-end Tests](src/server/__tests__/)
-
-## Introduction
-My solution for the Solita dev academy 2023 exercise.
-
-Throughout this repo I have included various READMEs to explain my decisions and challenges I had while working on this exercise.
-
-### Debrief
-This assignment was really fun, I enjoyed being able to apply all my knowledge and skills I have acquired from my career and from my various personal projects, while learning some new skills like using Jest for testing and Figma for UI/UX designing. 
 
 ## Features
 - All required and additional requirements of the exercise.
@@ -36,9 +23,7 @@ This assignment was really fun, I enjoyed being able to apply all my knowledge a
 - JS
 - TS
 - React
-- JOI
-- Axios
-- Lodash
+- Elastic UI
 
 ### Back-end
 - NodeJS
