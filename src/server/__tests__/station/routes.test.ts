@@ -84,7 +84,64 @@ describe("Station Routes", () => {
       expect(top_5_departure_stations).toBeDefined()
     })
 
-    it("Gives error when station stats cant find station", async () => {
+    it("Gives 400 error when time filter query parameters are not defined", async () => {
+      const new_station = { ...dummy_station_A, _id: undefined }
+      await save_station_data(new_station)
+      const new_journey = { ...dummy_journey_A, _id: undefined }
+      await save_journey_data(new_journey)
+
+      const response = await superTest(app)
+        .get(`/stations/${fake_station_id}/stats`)
+        .query({
+          start_date: undefined,
+          end_date: undefined,
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toStrictEqual({
+        message: "Start_date and end_date query parameters are required",
+      })
+    })
+
+    it("Gives 400 error when start_date is after end_date", async () => {
+      const new_station = { ...dummy_station_A, _id: undefined }
+      await save_station_data(new_station)
+      const new_journey = { ...dummy_journey_A, _id: undefined }
+      await save_journey_data(new_journey)
+
+      const response = await superTest(app)
+        .get(`/stations/${fake_station_id}/stats`)
+        .query({
+          end_date: "2021-01-01",
+          start_date: "2021-12-31",
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toStrictEqual({
+        message: "Start_date and end_date must be valid dates",
+      })
+    })
+
+    it("Gives 400 error when time filters are not dates", async () => {
+      const new_station = { ...dummy_station_A, _id: undefined }
+      await save_station_data(new_station)
+      const new_journey = { ...dummy_journey_A, _id: undefined }
+      await save_journey_data(new_journey)
+
+      const response = await superTest(app)
+        .get(`/stations/${fake_station_id}/stats`)
+        .query({
+          start_date: "not a date",
+          end_date: "not a date",
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toStrictEqual({
+        message: "Start_date and end_date must be valid dates",
+      })
+    })
+
+    it("Gives error when station cannot be found", async () => {
       const new_station = { ...dummy_station_A, _id: undefined }
       await save_station_data(new_station)
       const new_journey = { ...dummy_journey_A, _id: undefined }
