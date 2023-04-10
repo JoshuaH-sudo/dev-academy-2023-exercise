@@ -7,6 +7,7 @@ For explanations and more information, please see the [wiki](https://github.com/
 ## Setup
 ### Prerequisites: 
 Have yarn and docker installed on your machine.
+This application was designed to mainly be run on a linux, WSL or equivelent OS/System
 
 ### Scripts
 - Install dependencies: `yarn install`
