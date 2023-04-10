@@ -2,13 +2,16 @@
 [![CI/CD](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/codecov.yml/badge.svg)](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/codecov.yml)
 [![codecov](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise/branch/main/graph/badge.svg?token=Z1DXOYNLL2)](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise)
 
-## Setup
-### Prerequisites
-- Have yarn and docker installed on your machine.
+For explanations and more information, please see the [wiki](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/wiki).
 
-Install dependencies: `yarn install`
-Start app: `yarn docker`
-Run tests: `yarn test`
+## Setup
+### Prerequisites: 
+Have yarn and docker installed on your machine.
+
+### Scripts
+- Install dependencies: `yarn install`
+- Start app: `yarn docker`
+- Run tests: `yarn test`
 
 ## Features
 - All required and additional requirements of the exercise.
