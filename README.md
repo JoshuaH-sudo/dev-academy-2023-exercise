@@ -10,10 +10,10 @@ Start app: `yarn docker`
 Run tests: `yarn test`
 
 ## Index
-[Front-end](src/client/README.md)
-[Front-end Tests](src/client/__tests__/README.md)
-[Back-end](src/server/README.md)
-[Back-end Tests](src/server/__tests__/README.md)
+- [Front-end](src/client/)
+- [Front-end Tests](src/client/__tests__/)
+- [Back-end](src/server/)
+- [Back-end Tests](src/server/__tests__/)
 
 ## Introduction
 My solution for the Solita dev academy 2023 exercise.
