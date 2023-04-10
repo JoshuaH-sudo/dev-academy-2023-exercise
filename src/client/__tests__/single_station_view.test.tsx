@@ -131,12 +131,10 @@ describe("Single station view", () => {
         "http://localhost/stations/:station_doc_id/stats",
         (req, res, ctx) => {
           const start_date_param = req.url.searchParams.get("start_date")
-          console.log(start_date_param)
           if (!start_date_param) {
             throw new Error("No end date")
           }
           const month = new Date(start_date_param).getMonth()
-          console.log(month)
           if (month === 11) {
             const new_stats: Station_stats = {
               top_5_return_stations: [],

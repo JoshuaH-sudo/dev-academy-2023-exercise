@@ -118,7 +118,7 @@ describe("Station Routes", () => {
 
       expect(response.status).toBe(400)
       expect(response.body).toStrictEqual({
-        message: "Start_date and end_date must be valid dates",
+        message: "Start_date must be before end_date",
       })
     })
 
