@@ -35,18 +35,18 @@
 ### Single station view
 
 #### Recommended
-* Station name
-* Station address
-* Total number of journeys starting from the station
-* Total number of journeys ending at the station
+* ~~Station name~~
+* ~~Station address~~
+* ~~Total number of journeys starting from the station~~
+* ~~Total number of journeys ending at the station~~
 
 #### Additional
-* Station location on the map
-* The average distance of a journey starting from the station
-* The average distance of a journey ending at the station
-* Top 5 most popular return stations for journeys starting from the station
-* Top 5 most popular departure stations for journeys ending at the station
-* Ability to filter all the calculations per month
+* ~~Station location on the map~~
+* ~~The average distance of a journey starting from the station~~
+* ~~The average distance of a journey ending at the station~~
+* ~~Top 5 most popular return stations for journeys starting from the station~~
+* ~~Top 5 most popular departure stations for journeys ending at the station~~
+* ~~Ability to filter all the calculations per month~~
 
 ## Extra
 * ~~Add test suite~~
@@ -55,6 +55,13 @@
 * Running backend in Cloud
 * Implement E2E tests
 * Create UI for adding journeys or bicycle stations
+
+## TODO
+* Redownload and Repackage journey csv data
+* Add credentials to the database
+* CI/CD Automate release to public server
+* Set config collection to have a boolean check for both csv data types
+* Document process of each section.
 
 ## Bugs
 * App does not wait until all items are added to the database before setting csv_data_is_loaded to true

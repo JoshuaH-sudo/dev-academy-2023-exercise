@@ -1,9 +1,11 @@
+import moment from "moment"
 import { Stored_journey_data, Stored_station_data } from "../common"
+import { Station_stats } from "../server/controllers/station"
 
 export const dummy_journey_A: Stored_journey_data = {
   _id: "1",
-  departure_date: "2021-01-01",
-  return_date: "2021-01-02",
+  departure_date: moment("2021-01-01").toISOString(),
+  return_date: moment("2021-01-02").toISOString(),
   departure_station_id: "1",
   departure_station_name: "departure_station_A",
   return_station_id: "2",
@@ -14,8 +16,8 @@ export const dummy_journey_A: Stored_journey_data = {
 
 export const dummy_journey_B: Stored_journey_data = {
   _id: "2",
-  departure_date: "2021-01-02",
-  return_date: "2021-01-03",
+  departure_date: moment("2021-01-02").toISOString(),
+  return_date: moment("2021-01-03").toISOString(),
   departure_station_id: "3",
   departure_station_name: "departure_station_B",
   return_station_id: "4",
@@ -25,7 +27,10 @@ export const dummy_journey_B: Stored_journey_data = {
 }
 
 //List of journeys
-export const dummy_journeys: Stored_journey_data[] = [dummy_journey_A, dummy_journey_B]
+export const dummy_journeys: Stored_journey_data[] = [
+  dummy_journey_A,
+  dummy_journey_B,
+]
 
 //Values need to be unique to help with testing
 export const dummy_station_A: Stored_station_data = {
@@ -62,4 +67,16 @@ export const dummy_station_B: Stored_station_data = {
   y: 222.222,
 }
 
-export const dummy_stations: Stored_station_data[] = [dummy_station_A, dummy_station_B]
+export const dummy_stations: Stored_station_data[] = [
+  dummy_station_A,
+  dummy_station_B,
+]
+
+export const dummy_station_stats: Station_stats = {
+  top_5_departure_stations: [dummy_station_A],
+  top_5_return_stations: [dummy_station_B],
+  total_journeys_started: 1,
+  total_journeys_ended: 2,
+  average_distance_started: 1000,
+  average_distance_ended: 2000,
+}

@@ -1,6 +1,7 @@
 import {
   clear_stations,
-  get_stations,
+  csv_files,
+  import_stations_csv_to_database,
   read_csv_station_data,
   save_station_data,
 } from "../../controllers/station"
@@ -30,6 +31,7 @@ describe("Station Collection", () => {
     await clear_stations()
 
     const new_document_count = await Station.countDocuments()
+
     expect(new_document_count).toBe(0)
   })
 
@@ -37,7 +39,7 @@ describe("Station Collection", () => {
     await read_csv_station_data(good_stations_csv_file)
 
     const stored_station = await Station.findOne({
-      nimi: dummy_station_A.nimi
+      nimi: dummy_station_A.nimi,
     })
 
     expect(stored_station).toBeDefined()

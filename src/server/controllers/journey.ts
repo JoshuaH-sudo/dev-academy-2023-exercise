@@ -9,6 +9,7 @@ import { Request, Response } from "express"
 
 import debug from "debug"
 import Joi from "joi"
+import moment from "moment"
 const debugLog = debug("app:journey_controller:log")
 const errorLog = debug("app:journey_controller:error")
 
@@ -113,7 +114,7 @@ export function read_csv_journey_data(filePath: string): Promise<void> {
   })
 }
 
-export async function save_journey_data(data: Journey_data) {
+export function save_journey_data(data: Journey_data) {
   const new_journey = new Journey(data)
   return new_journey.save()
 }
@@ -172,7 +173,7 @@ export async function get_journeys(
     }
 
     const skip = page * limit
-    const journeys = await Journey.find().skip(skip).limit(limit)
+    const journeys = await Journey.find().skip(skip).limit(limit).lean()
     //sort stations by the given sort parameter manually,
     //as mongoose sort() applies to all documents in the collection,
     //not just the ones that are returned by the query.

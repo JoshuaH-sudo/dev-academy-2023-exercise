@@ -1,4 +1,4 @@
-const app = require("../../index")
+const app = require("../../index").app
 import superTest from "supertest"
 import { save_journey_data } from "../../controllers/journey"
 import { dummy_journey_A } from "../../../__mocks__/data"
@@ -8,11 +8,11 @@ import Journey from "../../models/journey"
 describe("Journey Routes", () => {
   it("Should return 200 when getting journeys", async () => {
     //store journey data without _id
-    const new_journey = { ...dummy_journey_A, _id: undefined }
-    await save_journey_data(new_journey)
+    const new_journey = { ...dummy_journey_A, _id: undefined}
+    const stored_journey = await save_journey_data(new_journey)
 
     const saved_journey = await Journey.findOne({
-      _id: new_journey._id,
+      _id: stored_journey._id,
     })
 
     expect(saved_journey).toBeDefined()

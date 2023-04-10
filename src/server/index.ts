@@ -30,6 +30,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "../../", "public")))
+app.use(express.static(path.join(__dirname, "../../", "public" , "dist")))
 
 app.use("/", app_router)
 app.use("/journeys", journey_router)
@@ -69,4 +70,6 @@ if (process.env.NODE_ENV === "test") {
   start_database()
 }
 
-module.exports = app
+//Has to be exported like this to allow the bin/www to import app correctly
+module.exports.app = app
+module.exports.start_database = start_database

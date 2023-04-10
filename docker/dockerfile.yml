@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:gallium-bullseye-slim
 WORKDIR /home/node/app
 COPY ../package*.json ./
 RUN yarn install

@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 module.exports = {
   entry: "./src/client/index.tsx",
   mode: "development",
-  devtool: 'inline-source-map',
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
@@ -22,6 +22,15 @@ module.exports = {
           "css-loader",
         ],
       },
+      {
+        //Ensure leaflet images are loaded bu adding them to the root level of the public folder
+        test: /\.png$/,
+        loader: "file-loader",
+        options: {
+          outputPath: "../",
+          name: "[name].[ext]",
+        },
+      },
     ],
   },
   resolve: {
@@ -35,7 +44,8 @@ module.exports = {
     //Will automatically attach the bundle to the index.html
     new HtmlWebpackPlugin({
       title: "Helsinki City Bike",
-      filename: "../index.html",
+      outputPath: "../",
+      filename: "index.html",
       template: "./src/client/assets/index.html",
     }),
     new MiniCssExtractPlugin({

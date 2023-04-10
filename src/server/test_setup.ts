@@ -1,18 +1,18 @@
 import mongoose from "mongoose"
 
+
+//Making absolutely sure there is no data in the database before any test
 beforeAll(async () => {
   await connect_to_database()
 })
 
-afterEach(async () => {
-  //Clear all collections
-  const collections = mongoose.connection.collections
+beforeEach(async () => {
+  //Ensure there is no data in the database before each test
+  await clean_database()
+  jest.restoreAllMocks()
+})
 
-  for (const key in collections) {
-    const collection = collections[key]
-    await collection.deleteMany({})
-  }
-  // Reset any runtime handlers tests may use.
+afterEach(async () => {
   jest.restoreAllMocks()
 })
 
@@ -20,12 +20,23 @@ afterAll(async () => {
   await disconnect_from_database()
 })
 
-export const connect_to_database = async (): Promise<void> => {
-  //@ts-ignore mongo uri is provided by jest-mongodb
-  await mongoose.connect(globalThis.__MONGO_URI__)
+const clean_database = () => {
+  const collections = mongoose.connection.collections
+
+  const promises = []
+  for (const key in collections) {
+    const collection = collections[key]
+    promises.push(collection.deleteMany({}))
+  }
+
+  return Promise.all(promises)
 }
 
-export const disconnect_from_database = async (): Promise<void> => {
+export const connect_to_database = () => {
+  // @ts-ignore global variables are provided by environment @shelf/jest-mongodb
+  return mongoose.connect(global.__MONGO_URI__, {dbName: global.__MONGO_DB_NAME__})
+}
 
-  await mongoose.connection.close()
+export const disconnect_from_database = (): Promise<void> => {
+  return mongoose.connection.close()
 }

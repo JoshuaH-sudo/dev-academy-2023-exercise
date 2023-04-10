@@ -3,6 +3,7 @@ import { parse } from "csv-parse"
 import fs from "fs"
 import { csv_station_schema } from "../models/station"
 import Station from "../models/station"
+import Journey from "../models/journey"
 import { csv_data_is_loaded } from "./config"
 import { Station_csv_data, Station_data, Stored_station_data } from "../../common"
 import { Request, Response } from "express"
@@ -13,34 +14,24 @@ const debugLog = debug("app:Station_controller:log")
 const errorLog = debug("app:Station_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets", "stations")
-const csv_files = fs.readdirSync(datasets_path)
+export const csv_files = fs.readdirSync(datasets_path)
 
 //Clear all Stations from the database
 export async function clear_stations() {
-  try {
-    debugLog("Clearing Stations from the database")
-    return Station.deleteMany({})
-  } catch (error) {
-    errorLog("Failed to clear Stations :", error)
-    throw error
-  }
+  debugLog("Clearing Stations from the database")
+  return Station.deleteMany({})
 }
 
 //import all the csv files in the datasets folder to the database
 export async function import_stations_csv_to_database() {
-  try {
-    //loop through all the csv files in the datasets folder
-    for (const file of csv_files) {
-      debugLog(`Importing ${file} to the database`)
-      const csv_file_path = path.join(datasets_path, file)
-      await read_csv_station_data(csv_file_path)
-    }
-    debugLog("All station csv files imported to the database")
-    return csv_data_is_loaded()
-  } catch (error) {
-    errorLog("Failed to import csv datasets to database :", error)
-    throw error
+  //loop through all the csv files in the datasets folder
+  for (const file of csv_files) {
+    debugLog(`Importing ${file} to the database`)
+    const csv_file_path = path.join(datasets_path, file)
+    await read_csv_station_data(csv_file_path)
   }
+  debugLog("All station csv files imported to the database")
+  return csv_data_is_loaded()
 }
 
 export function read_csv_station_data(filePath: string): Promise<void> {
@@ -109,9 +100,9 @@ export function read_csv_station_data(filePath: string): Promise<void> {
   })
 }
 
-export async function save_station_data(data: Station_data) {
+export function save_station_data(data: Station_data) {
   const new_station = new Station(data)
-  await new_station.save()
+  return new_station.save()
 }
 
 export interface Station_query_result {
@@ -186,4 +177,276 @@ export async function get_stations(
       message: "Failed to get stations",
     })
   }
+}
+
+export const get_station = async (req: Request<{ _id: string }>, res: Response) => {
+  try {
+    const station = await Station.findById(req.params._id).lean()
+    if (!station) {
+      return res.status(404).json({
+        message: "Station not found",
+      })
+    }
+    res.status(200).json(station)
+  } catch (error) {
+    errorLog("Failed to get station :", error)
+    res.status(500).json({
+      message: "Failed to get station",
+    })
+  }
+}
+
+export interface Station_stats {
+  //Total number of journeys starting from the station
+  total_journeys_started: number
+  //Total number of journeys ending at the station
+  total_journeys_ended: number
+  // //The average distance of a journey starting from the station
+  average_distance_started: number
+  // //The average distance of a journey ending at the station
+  average_distance_ended: number
+  //Top 5 most popular return stations for journeys starting from the station
+  top_5_return_stations: Stored_station_data[]
+  //Top 5 most popular departure stations for journeys ending at the station
+  top_5_departure_stations: Stored_station_data[]
+}
+
+export interface Get_station_stats_query_params extends Partial<Time_filter> {}
+
+export const get_station_stats = async (
+  req: Request<{ _id: string }, {}, {}, Time_filter | undefined>,
+  res: Response<Station_stats | { message: string }>
+) => {
+  const { _id } = req.params
+  const time_filter = req.query
+  //check that time filter query is defined
+  if (!time_filter?.start_date || !time_filter?.end_date) {
+    return res.status(400).json({
+      message: "Start_date and end_date query parameters are required",
+    })
+  }
+
+  //check that start_date is after end_date
+  if (time_filter.start_date > time_filter.end_date) {
+    return res.status(400).json({
+      message: "Start_date must be before end_date",
+    })
+  }
+
+  //check that start_date and end_date are valid dates
+  if (
+    isNaN(Date.parse(time_filter.start_date)) ||
+    isNaN(Date.parse(time_filter.end_date))
+  ) {
+    return res.status(400).json({
+      message: "Start_date and end_date must be valid dates",
+    })
+  }
+
+  const station = await Station.findById(_id).lean()
+  if (!station || !station.station_id) {
+    return res.status(404).json({
+      message: "Station not found",
+    })
+  }
+
+  const total_journeys_started = await Journey.find({
+    departure_date: {
+      $gte: time_filter.start_date,
+      $lte: time_filter.end_date,
+    },
+  }).countDocuments({
+    departure_station_id: station.station_id,
+  })
+  const total_journeys_ended = await Journey.find({
+    departure_date: {
+      $gte: time_filter.start_date,
+      $lte: time_filter.end_date,
+    },
+  }).countDocuments({
+    return_station_id: station.station_id,
+  })
+
+  const average_distance_started = await get_average_distance_started(
+    station.station_id,
+    time_filter
+  )
+  const average_distance_ended = await get_average_distance_ended(
+    station.station_id,
+    time_filter
+  )
+
+  const top_5_return_stations = await get_top_5_return_stations(
+    station.station_id,
+    time_filter
+  )
+
+  const top_5_departure_stations = await get_top_5_departure_stations(
+    station.station_id,
+    time_filter
+  )
+
+  const response_data: Station_stats = {
+    total_journeys_started,
+    total_journeys_ended,
+    average_distance_started: average_distance_started[0]?.average_distance ?? 0,
+    average_distance_ended: average_distance_ended[0]?.average_distance ?? 0,
+    top_5_return_stations: top_5_return_stations.map(
+      (station) => station.station_data[0]
+    ),
+    top_5_departure_stations: top_5_departure_stations.map(
+      (station) => station.station_data[0]
+    ),
+  }
+
+  return res.status(200).json(response_data)
+}
+
+export interface Top_stations {
+  _id: string
+  count: number
+  station_data: Stored_station_data[]
+}
+
+export interface Time_filter {
+  start_date: string
+  end_date: string
+}
+
+//Top 5 most popular return stations for journeys starting from the station
+export const get_top_5_return_stations = async (
+  station_doc_id: string,
+  time_filter: Time_filter
+) => {
+  debugLog("Getting top 5 return stations for station :", station_doc_id)
+  return Journey.aggregate<Top_stations>([
+    {
+      //Find all journeys that have the same departure station id as the given station id
+      $match: {
+        departure_station_id: station_doc_id,
+        departure_date: {
+          $gte: new Date(time_filter.start_date),
+          $lte: new Date(time_filter.end_date),
+        },
+      },
+    },
+    {
+      //Group journeys by their return station id and get a count
+      $group: {
+        _id: "$return_station_id",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      //Sort that group by the count in descending order
+      $sort: {
+        count: -1,
+      },
+    },
+    {
+      //The Journeys with the highest count will be at the top of the array
+      $limit: 5,
+    },
+    {
+      //Get the return station data for each of the top 5 return stations
+      $lookup: {
+        from: "stations",
+        localField: "_id",
+        foreignField: "station_id",
+        as: "station_data",
+      },
+    },
+  ])
+}
+
+//Top 5 most popular departure stations for journeys ending at the station
+export const get_top_5_departure_stations = async (
+  station_doc_id: string,
+  time_filter: Time_filter
+) => {
+  debugLog("Getting top 5 departure stations for station :", station_doc_id)
+  return Journey.aggregate<Top_stations>([
+    {
+      $match: {
+        return_station_id: station_doc_id,
+        departure_date: {
+          $gte: new Date(time_filter.start_date),
+          $lte: new Date(time_filter.end_date),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$departure_station_id",
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: {
+        count: -1,
+      },
+    },
+    {
+      $limit: 5,
+    },
+    {
+      $lookup: {
+        from: "stations",
+        localField: "_id",
+        foreignField: "station_id",
+        as: "station_data",
+      },
+    },
+  ])
+}
+
+//The average distance of a journey starting from the station
+type average_distance = { average_distance: number }
+export const get_average_distance_started = async (
+  station_doc_id: string,
+  time_filter: Time_filter
+) => {
+  debugLog("Getting average distance started for station :", station_doc_id)
+  return Journey.aggregate<average_distance>([
+    {
+      $match: {
+        departure_station_id: station_doc_id,
+        departure_date: {
+          $gte: new Date(time_filter.start_date),
+          $lte: new Date(time_filter.end_date),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        average_distance: { $avg: "$covered_distance" },
+      },
+    },
+  ])
+}
+
+//The average distance of a journey ending at the station
+export const get_average_distance_ended = async (
+  station_doc_id: string,
+  time_filter: Time_filter
+) => {
+  debugLog("Getting average distance ended for station :", station_doc_id)
+  return Journey.aggregate<average_distance>([
+    {
+      $match: {
+        return_station_id: station_doc_id,
+        departure_date: {
+          $gte: new Date(time_filter.start_date),
+          $lte: new Date(time_filter.end_date),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        average_distance: { $avg: "$covered_distance" },
+      },
+    },
+  ])
 }

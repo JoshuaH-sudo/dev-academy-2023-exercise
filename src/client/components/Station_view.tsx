@@ -4,6 +4,7 @@ import {
   EuiBasicTableColumn,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiLink,
   EuiSearchBar,
   EuiSearchBarProps,
   EuiTableSortingType,
@@ -11,12 +12,13 @@ import {
   Query,
   SearchFilterConfig,
 } from "@elastic/eui"
-import axios from "axios"
 import { Stored_station_data } from "../../common"
 import {
   Get_stations_query_params,
   Station_query_result,
 } from "../../server/controllers/station"
+import Single_station_view from "./single_station_view/Single_station_view"
+import use_api from "../hooks/use_api"
 
 const Station_view = () => {
   const [is_loading, set_is_loading] = useState(false)
@@ -32,6 +34,7 @@ const Station_view = () => {
     pageSizeOptions: [10, 25, 50],
     showPerPageOptions: true,
   })
+  const api = use_api()
   const [error, set_error] = useState<string | undefined>(undefined)
 
   const get_station_data = async () => {
@@ -46,16 +49,17 @@ const Station_view = () => {
         sort: sorting.sort.field,
         order: sorting.sort.direction,
       }
-      const response = await axios.get<Station_query_result>("/stations", {
+      const response = await api.get<Station_query_result>("/stations", {
         params,
       })
+
       set_station_data(response.data.stations)
       set_pagination({
         ...pagination,
         totalItemCount: response.data.total_stations,
       })
     } catch (error) {
-      set_error(error as string)
+      if (typeof error === "string") set_error(error)
       console.error(error)
     }
     set_is_loading(false)
@@ -106,12 +110,25 @@ const Station_view = () => {
     }
   }
 
+  const [show_single_station_view, set_show_single_station_view] = useState<string>()
+  const show_station_view = (station_doc_id: string) => {
+    set_show_single_station_view(station_doc_id)
+  }
+  const close_station_view = () => {
+    set_show_single_station_view(undefined)
+  }
+
   //Define the columns for the table to display station data
   const columns: EuiBasicTableColumn<Stored_station_data>[] = [
     {
       field: "nimi",
       name: "Finnish name",
       sortable: true,
+      render: (nimi, item) => (
+        <EuiLink onClick={() => show_station_view(item._id)} target="_blank">
+          {nimi}
+        </EuiLink>
+      ),
     },
     {
       field: "namn",
@@ -131,34 +148,45 @@ const Station_view = () => {
   ]
 
   return (
-    <EuiFlexGroup gutterSize="s" direction="column">
-      <EuiFlexItem grow={false}>
-        <EuiSearchBar
-          box={{
-            incremental: true,
-          }}
-          filters={filters}
-          onChange={on_search_change}
+    <>
+      <EuiFlexGroup gutterSize="s" direction="column">
+        <EuiFlexItem grow={false}>
+          <EuiSearchBar
+            box={{
+              incremental: true,
+            }}
+            filters={filters}
+            onChange={on_search_change}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiBasicTable
+            data-testid="station_table"
+            loading={is_loading}
+            error={error}
+            items={queried_items}
+            columns={columns}
+            pagination={pagination}
+            onChange={({ page: { index, size }, sort }) => {
+              set_pagination({ ...pagination, pageIndex: index, pageSize: size })
+              if (sort) {
+                set_sorting({
+                  sort: { field: sort.field, direction: sort.direction },
+                })
+              }
+            }}
+            sorting={sorting}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
+
+      {show_single_station_view && (
+        <Single_station_view
+          station_doc_id={show_single_station_view}
+          on_close={close_station_view}
         />
-      </EuiFlexItem>
-      <EuiFlexItem>
-        <EuiBasicTable
-          data-testid="station_table"
-          loading={is_loading}
-          error={error}
-          items={queried_items}
-          columns={columns}
-          pagination={pagination}
-          onChange={({ page: { index, size }, sort }) => {
-            set_pagination({ ...pagination, pageIndex: index, pageSize: size })
-            if (sort) {
-              set_sorting({ sort: { field: sort.field, direction: sort.direction } })
-            }
-          }}
-          sorting={sorting}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+      )}
+    </>
   )
 }
 
