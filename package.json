@@ -6,7 +6,7 @@
     "type_check": "tsc --noEmit",
     "get_datasets": "./build/scripts/extract_datasets.sh",
     "start": "yarn get_datasets && DEBUG=app* ts-node ./bin/www",
-    "test": "NODE_ENV=test yarn get_datasets && jest",
+    "test": "NODE_ENV=test && jest",
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
     "dev_build": "NODE_ENV=development && yarn webpack --config ./build/webpack/webpack.dev.js --mode development",
