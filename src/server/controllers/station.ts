@@ -14,7 +14,7 @@ const debugLog = debug("app:Station_controller:log")
 const errorLog = debug("app:Station_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets", "stations")
-const csv_files = fs.readdirSync(datasets_path)
+export const csv_files = fs.readdirSync(datasets_path)
 
 //Clear all Stations from the database
 export async function clear_stations() {

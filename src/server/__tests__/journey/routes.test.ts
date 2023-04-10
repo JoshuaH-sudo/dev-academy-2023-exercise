@@ -1,4 +1,4 @@
-const app = require("../../index")
+const app = require("../../index").app
 import superTest from "supertest"
 import { save_journey_data } from "../../controllers/journey"
 import { dummy_journey_A } from "../../../__mocks__/data"
