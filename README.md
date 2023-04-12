@@ -9,10 +9,14 @@ For explanations, instructions and more information, please see the [wiki](https
 Have yarn and docker installed on your machine.
 This application was designed to mainly be run on a linux, WSL or equivelent OS/System
 
-### Scripts
+### Run locally from repo
+- Clone repo
 - Install dependencies: `yarn install`
 - Start app: `yarn docker`
 - Run tests: `yarn test`
+
+### Docker image
+```docker pull joshuahsudo/hsl_bike_app```
 
 ## Features
 - All required and additional requirements of the exercise.
