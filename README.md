@@ -2,7 +2,7 @@
 [![CI/CD](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/codecov.yml/badge.svg)](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/codecov.yml)
 [![codecov](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise/branch/main/graph/badge.svg?token=Z1DXOYNLL2)](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise)
 
-For explanations and more information, please see the [wiki](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/wiki).
+For explanations, instructions and more information, please see the [wiki](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/wiki).
 
 ## Setup
 ### Prerequisites: 
