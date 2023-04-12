@@ -57,7 +57,7 @@
 * Create UI for adding journeys or bicycle stations
 
 ## TODO
-* Redownload and Repackage journey csv data
+* ~~Redownload and Repackage journey csv data~~
 * Add credentials to the database
 * CI/CD Automate release to public server
 * Set config collection to have a boolean check for both csv data types
