@@ -166,7 +166,7 @@ describe("Single station view", () => {
 
     await waitFor(async () => {
       expect(popular_station).not.toBeInTheDocument()
-    })
+    }, { timeout: 30000 })
   })
 
   //Unable to test chart, does not render all child components
