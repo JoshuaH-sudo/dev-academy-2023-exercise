@@ -118,13 +118,6 @@ describe("Single station view", () => {
   })
 
   it("Filter by month", async () => {
-    const { findByText } = render(
-      <Single_station_view
-        station_doc_id={station_doc_id}
-        on_close={on_close_mock}
-      />
-    )
-
     server.use(
       //Route to test that the stations are filtered by month
       rest.get(
@@ -152,6 +145,12 @@ describe("Single station view", () => {
       )
     )
 
+    const { findByText } = render(
+      <Single_station_view
+        station_doc_id={station_doc_id}
+        on_close={on_close_mock}
+      />
+    )
     //check that data is shown in view
     //check that the chart has been updated
     const popular_station = await findByText(
