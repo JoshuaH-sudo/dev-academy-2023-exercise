@@ -16,7 +16,9 @@ This application was designed to mainly be run on a linux, WSL or equivelent OS/
 - Run tests: `yarn test`
 
 ### Docker image
-```docker pull joshuahsudo/hsl_bike_app```
+```
+docker pull joshuahsudo/hsl_bike_app
+```
 
 ## Features
 - All required and additional requirements of the exercise.
