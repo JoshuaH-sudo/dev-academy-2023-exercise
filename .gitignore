@@ -7,3 +7,8 @@ node_modules/
 
 coverage/
 globalConfig.json
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
