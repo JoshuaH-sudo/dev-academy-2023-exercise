@@ -5,17 +5,20 @@
   "scripts": {
     "type_check": "tsc --noEmit",
     "get_datasets": "./build/scripts/extract_datasets.sh",
-    "start": "DEBUG=app* ts-node ./bin/www",
+
     "test": "NODE_ENV=test && jest",
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
+
+    "start": "DEBUG=app* ts-node ./bin/www",
     "dev_build": "yarn get_datasets && NODE_ENV=development && yarn webpack --config ./build/webpack/webpack.dev.js --mode development",
     "dev": "yarn dev_build && yarn start",
+
     "docker_stop": "docker-compose -f ./docker/docker-compose.yml stop",
     "docker_build": "docker-compose -f ./docker/docker-compose.yml build",
     "docker_start": "docker-compose -f ./docker/docker-compose.yml up -d",
     "docker_restart": "yarn docker_stop && yarn docker_start",
-    "docker": "yarn type_check && yarn dev_build && yarn docker_build && yarn docker_restart"
+    "docker": "yarn type_check && yarn docker_build && yarn docker_restart"
   },
   "dependencies": {
     "@elastic/charts": "^55.0.0",

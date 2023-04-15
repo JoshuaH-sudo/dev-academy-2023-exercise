@@ -1,16 +1,17 @@
 .git*
 .nvmrc
 .prettierrc
-jest*
 *.md
 tsconfig.json
 
-test_datsets
+node_modules
+
+test_datasets
+*/__mocks__/*
+*/__test__/*
+coverage
 
 figma
-__mocks__
-__test__
-coverage
 
 .env*
 .flaskenv*
