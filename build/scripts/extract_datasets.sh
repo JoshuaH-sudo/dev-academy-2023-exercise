@@ -1,6 +1,6 @@
 #!/bin/bash
 DATASETS_PATH="$PWD/datasets"
-JOURNEY_DIR="$JOURNEY_DATASETS/journeys"
+JOURNEY_DIR="$DATASETS_PATH/journeys"
 
 if [ "$(ls -A $JOURNEY_DIR)" ]; then
   echo "Jounrey datasets already exists, skipping extraction"
@@ -9,10 +9,10 @@ else
   tar xvf $DATASETS_PATH/journey_datasets.tar.bz2 -C .
 fi
 
-STATIONS_DIR="$STATIONS_DATASETS/stations"
+STATIONS_DIR="$DATASETS_PATH/stations"
 if [ "$(ls -A $STATIONS_DIR)" ]; then
-  echo "Stations datasets already exists, skipping extraction"
+  echo "Station datasets already exists, skipping extraction"
 else
-  echo "$STATIONS_DIR is Empty, extracting journey datasets"
+  echo "$STATIONS_DIR is Empty, extracting station datasets"
   tar xvf $DATASETS_PATH/station_datasets.tar.bz2 -C .
 fi
