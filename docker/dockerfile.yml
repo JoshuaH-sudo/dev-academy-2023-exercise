@@ -1,6 +1,9 @@
 FROM node:gallium-bullseye-slim
 WORKDIR /home/node/app
-COPY ../package*.json ./
+
+# Copy all files from the root directory
+COPY . .
+
 RUN yarn install
-COPY ../ ./
+
 EXPOSE 8080
