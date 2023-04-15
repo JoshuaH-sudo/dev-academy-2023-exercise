@@ -19,6 +19,9 @@ import {
   clear_stations,
   import_stations_csv_to_database,
 } from "./controllers/station"
+const { config } = require('dotenv');
+config();
+
 const debugLog = debug("app:server:log")
 const errorLog = debug("app:server:error")
 
@@ -42,7 +45,8 @@ app.use("/stations", station_router)
 async function start_database() {
   debugLog("Connecting to database")
 
-  await mongoose.connect(process.env.MONGO_URI || "mongodb://mongo:27017")
+  //@ts-ignore
+  await mongoose.connect(process.env.MONGO_URI)
 
   try {
     debugLog("Initializing the database")
