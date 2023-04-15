@@ -66,3 +66,4 @@
 ## Bugs
 * App does not wait until all items are added to the database before setting csv_data_is_loaded to true
 * Station stats take to long to get. split up request data.
+* Switching page in table before loading completes causes it to continually switch between the two pages
