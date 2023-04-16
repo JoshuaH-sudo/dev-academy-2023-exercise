@@ -1,0 +1,27 @@
+version: "3"
+services:
+  hsl_bike_app:
+    # This pulls the image from Docker Hub not the local repo
+    image: joshuahsudo/hsl_bike_app:latest
+    working_dir: /home/node/app
+    ports:
+      - "8080:8080"
+    expose:
+      - "8081"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://app_database:27017/dev-academy
+    command: yarn start
+    depends_on:
+      - app_database
+
+  app_database:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+volumes:
+  mongo-data:
