@@ -2,13 +2,16 @@
 .nvmrc
 .prettierrc
 *.md
-tsconfig.json
 
+public/*
 node_modules
+docker
 
 test_datasets
-*/__mocks__/*
-*/__test__/*
+**/__mocks__
+**/__tests__
+**/test_setup.ts
+**/*jest*
 coverage
 
 figma
