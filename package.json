@@ -10,8 +10,8 @@
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
 
-    "start": "DEBUG=app* ts-node ./bin/www",
-    "dev_build": "yarn get_datasets && NODE_ENV=development && yarn webpack --config ./build/webpack/webpack.dev.js --mode development",
+    "start": "yarn get_datasets && DEBUG=app* ts-node ./bin/www",
+    "dev_build": "NODE_ENV=development && yarn webpack --config ./build/webpack/webpack.dev.js --mode development",
     "dev": "yarn dev_build && yarn start",
 
     "docker_stop": "docker-compose -f ./docker/docker-compose.yml stop",
