@@ -35,7 +35,6 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    filename: "bundle.js",
     path: path.resolve(__dirname, "../../public", "dist"),
   },
   plugins: [
@@ -44,8 +43,6 @@ module.exports = {
       title: "Helsinki City Bike",
       outputPath: "../",
       filename: "index.html",
-      inject: "body",
-      chunks: ["bundle.js.br", "main.css.br"],
       template: "./src/client/assets/index.html",
     }),
     new MiniCssExtractPlugin({

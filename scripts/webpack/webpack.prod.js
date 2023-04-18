@@ -1,14 +1,14 @@
-const common_webpack = require("./webpack.common")
-const { merge } = require('webpack-merge');
 const zlib = require("zlib")
+const { merge } = require("webpack-merge")
 const CompressionPlugin = require("compression-webpack-plugin")
+const common_webpack = require("./webpack.common")
 
 module.exports = merge(common_webpack, {
   mode: "production",
   plugins: [
     new CompressionPlugin({
       filename: "[path][base].br",
-      exclude: ["@elastic"],
+      exclude: "@elastic/",
       algorithm: "brotliCompress",
       test: /\.(js|css|html|svg)$/,
       compressionOptions: {
@@ -18,7 +18,6 @@ module.exports = merge(common_webpack, {
       },
       threshold: 10240,
       minRatio: 0.8,
-      deleteOriginalAssets: true,
     }),
-  ]
+  ],
 })

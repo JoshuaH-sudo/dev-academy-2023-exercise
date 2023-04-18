@@ -3,6 +3,7 @@ import path from "path"
 import cookieParser from "cookie-parser"
 import logger from "morgan"
 import mongoose from "mongoose"
+import expressStaticGzip from "express-static-gzip";
 
 import app_router from "./routes/app"
 import journey_router from "./routes/journey"
@@ -33,7 +34,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "../../", "public")))
-app.use(express.static(path.join(__dirname, "../../", "public" , "dist")))
+app.use("/", expressStaticGzip(path.join(__dirname, "../../", "public", "dist"), {
+ enableBrotli: true
+}));
 
 app.use("/", app_router)
 app.use("/journeys", journey_router)
