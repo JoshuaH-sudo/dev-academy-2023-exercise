@@ -5,24 +5,29 @@
   "scripts": {
     "type_check": "tsc --noEmit",
     "get_datasets": "./scripts/extract_datasets.sh",
+
     "test": "NODE_ENV=test && jest",
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
+
     "start": "DEBUG=app* ts-node ./bin/www",
     "build": "yarn get_datasets && ./scripts/build.sh",
+
     "dev": "NODE_ENV=development yarn build && yarn start",
     "docker_dev_stop": "docker-compose -f ./docker/docker-compose.dev.yml stop",
     "docker_dev_build": "docker-compose -f ./docker/docker-compose.dev.yml build",
     "docker_dev_start": "docker-compose -f ./docker/docker-compose.dev.yml up -d",
     "docker_dev_restart": "yarn docker_dev_stop && yarn docker_dev_start",
     "docker_dev": "yarn type_check && yarn docker_dev_build && yarn docker_dev_restart",
+
     "prod": "NODE_ENV=production yarn build && yarn start",
     "docker_prod_stop": "docker-compose -f ./docker/docker-compose.prod.build.yml stop",
-    "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.build.yml build",
+    "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.build.yml build --no-cache",
     "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.build.yml up -d",
     "docker_prod_restart": "yarn docker_prod_stop && yarn docker_prod_start",
     "docker_prod": "yarn docker_prod_build && yarn docker_prod_restart",
-    "docker_push": "docker tag hsl_bike_app hsl_bike_app:latest && docker push hsl_bike_app:latest"
+
+    "docker_push": "yarn docker_prod_build && docker tag hsl_bike_app hsl_bike_app:latest && docker push hsl_bike_app:latest"
   },
   "dependencies": {
     "@elastic/charts": "^55.0.0",
