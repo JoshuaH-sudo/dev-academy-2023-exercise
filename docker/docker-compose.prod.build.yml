@@ -1,7 +1,8 @@
 version: "3"
 services:
+  # build the production version of the app
   hsl_bike_app:
-    build: 
+    build:
       context: ../
       dockerfile: ./docker/dockerfile.yml
     working_dir: /home/node/app
@@ -11,9 +12,9 @@ services:
       - "8081"
     environment:
       - PORT=8080
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGO_URI=mongodb://app_database:27017/dev-academy
-    command: yarn dev
+    command: yarn prod
     depends_on:
       - app_database
 

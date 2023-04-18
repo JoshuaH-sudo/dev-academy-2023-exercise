@@ -3,7 +3,7 @@
 .prettierrc
 *.md
 
-public/*
+public
 node_modules
 docker
 

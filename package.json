@@ -5,27 +5,24 @@
   "scripts": {
     "type_check": "tsc --noEmit",
     "get_datasets": "./scripts/extract_datasets.sh",
-
     "test": "NODE_ENV=test && jest",
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
-
     "start": "DEBUG=app* ts-node ./bin/www",
     "build": "yarn get_datasets && ./scripts/build.sh",
-
     "dev": "NODE_ENV=development yarn build && yarn start",
     "docker_dev_stop": "docker-compose -f ./docker/docker-compose.dev.yml stop",
     "docker_dev_build": "docker-compose -f ./docker/docker-compose.dev.yml build",
     "docker_dev_start": "docker-compose -f ./docker/docker-compose.dev.yml up -d",
     "docker_dev_restart": "yarn docker_dev_stop && yarn docker_dev_start",
     "docker_dev": "yarn type_check && yarn docker_dev_build && yarn docker_dev_restart",
-
     "prod": "NODE_ENV=production yarn build && yarn start",
-    "docker_prod_stop": "docker-compose -f ./docker/docker-compose.prod.yml stop",
-    "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.yml build --no-cache",
-    "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.yml up -d",
+    "docker_prod_stop": "docker-compose -f ./docker/docker-compose.prod.build.yml stop",
+    "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.build.yml build",
+    "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.build.yml up -d",
     "docker_prod_restart": "yarn docker_prod_stop && yarn docker_prod_start",
-    "docker_prod": "yarn docker_prod_build && yarn docker_prod_restart"
+    "docker_prod": "yarn docker_prod_build && yarn docker_prod_restart",
+    "docker_push": "docker tag hsl_bike_app hsl_bike_app:latest && docker push hsl_bike_app:latest"
   },
   "dependencies": {
     "@elastic/charts": "^55.0.0",
@@ -40,6 +37,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "axios": "^1.3.4",
+    "compression-webpack-plugin": "^10.0.0",
     "cookie-parser": "~1.4.4",
     "css-loader": "^6.7.3",
     "csv-parse": "^5.3.6",
@@ -48,6 +46,7 @@
     "eslint": "^8.0.1",
     "eslint-plugin-prettier": "^4.2.1",
     "express": "~4.16.1",
+    "express-static-gzip": "^2.1.7",
     "joi": "^17.8.4",
     "leaflet": "^1.9.3",
     "lodash": "^4.17.21",

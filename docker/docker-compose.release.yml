@@ -1,8 +1,9 @@
+# This will replicate a isolated production enviroment.
 version: "3"
 services:
   hsl_bike_app:
-    # This pulls the image from Docker Hub not the local repo
-    image: joshuahsudo/hsl_bike_app:latest
+    # pulls the image from docker hub, does not use the local build image
+    image: hsl_bike_app:latest
     working_dir: /home/node/app
     ports:
       - "8080:8080"
