@@ -13,3 +13,5 @@ globalConfig.json
 .flaskenv*
 !.env.project
 !.env.vault
+
+*code-workspace*

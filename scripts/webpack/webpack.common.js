@@ -4,14 +4,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
   entry: "./src/client/index.tsx",
-  mode: "development",
-  devtool: "inline-source-map",
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         use: "ts-loader",
-      exclude: [/node_modules/, /__test__/, /__mocks__/, /*.jest.*/],
+        exclude: [/node_modules/, /__test__/, /__mocks__/, /.jest./],
       },
       {
         test: /\.css$/,
@@ -46,6 +44,8 @@ module.exports = {
       title: "Helsinki City Bike",
       outputPath: "../",
       filename: "index.html",
+      inject: "body",
+      chunks: ["bundle.js.br", "main.css.br"],
       template: "./src/client/assets/index.html",
     }),
     new MiniCssExtractPlugin({
