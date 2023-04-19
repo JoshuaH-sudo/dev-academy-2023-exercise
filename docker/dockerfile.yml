@@ -4,5 +4,9 @@ WORKDIR /home/node/app
 # Copy all files from the root directory
 COPY . .
 RUN yarn install
+# Need this to decompress the dataset tar files
+RUN apt-get update
+RUN apt-get install bzip2
+
 
 EXPOSE 8080
