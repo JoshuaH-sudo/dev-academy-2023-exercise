@@ -9,20 +9,30 @@ services:
       - "8080:8080"
     expose:
       - "8081"
-    environment:
-      - PORT=8080
-      - NODE_ENV=production
-      - MONGO_URI=mongodb://app_database:27017/dev-academy
+    env_file:
+      - .env
     command: yarn prod
     depends_on:
       - app_database
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 16Gb
 
   app_database:
     image: mongo
     restart: always
     ports:
       - "27017:27017"
+    env_file:
+      - .env
     volumes:
       - mongo-data:/data/db
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 16Gb
 volumes:
   mongo-data:
