@@ -9,8 +9,7 @@ services:
       - "8080:8080"
     expose:
       - "8081"
-    env_file:
-      - .env
+    env_file: "../.env"
     command: yarn prod
     depends_on:
       - app_database
@@ -25,8 +24,7 @@ services:
     restart: always
     ports:
       - "27017:27017"
-    env_file:
-      - .env
+    env_file: "../.env"
     volumes:
       - mongo-data:/data/db
     deploy:

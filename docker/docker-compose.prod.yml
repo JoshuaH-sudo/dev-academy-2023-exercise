@@ -1,6 +1,5 @@
 version: "3"
 services:
-  # build the production version of the app
   hsl_bike_app:
     build:
       context: ../
