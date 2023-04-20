@@ -27,7 +27,7 @@
     "docker_prod_restart": "yarn docker_prod_stop && yarn docker_prod_start",
     "docker_prod": "yarn docker_prod_build && yarn docker_prod_restart",
 
-    "docker_push": "yarn docker_prod_build && docker tag hsl_bike_app hsl_bike_app:latest && docker push hsl_bike_app:latest"
+    "docker_push": "yarn docker_prod_build && docker tag docker-hsl_bike_app joshuahsudo/hsl_bike_app:latest && docker push joshuahsudo/hsl_bike_app:latest"
   },
   "dependencies": {
     "@elastic/charts": "^55.0.0",
