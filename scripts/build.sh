@@ -1,5 +1,5 @@
 #!/bin/bash
-
+mkdir -p ./public
 if [ "$(ls -A public)" ]; then
   rm -R ./public/*
 else 

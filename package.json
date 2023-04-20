@@ -21,11 +21,17 @@
     "docker_dev": "yarn type_check && yarn docker_dev_build && yarn docker_dev_restart",
 
     "prod": "NODE_ENV=production yarn build && yarn start",
-    "docker_prod_stop": "docker-compose -f ./docker/docker-compose.prod.build.yml stop",
-    "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.build.yml build --no-cache",
-    "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.build.yml up -d",
+    "docker_prod_stop": "docker-compose -f ./docker/docker-compose.prod.yml stop",
+    "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.yml build --no-cache",
+    "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.yml up -d",
     "docker_prod_restart": "yarn docker_prod_stop && yarn docker_prod_start",
     "docker_prod": "yarn docker_prod_build && yarn docker_prod_restart",
+
+    "docker_release_stop": "docker-compose -f ./docker/docker-compose.release.yml stop",
+    "docker_release_build": "docker-compose -f ./docker/docker-compose.release.yml build --no-cache",
+    "docker_release_start": "docker-compose -f ./docker/docker-compose.release.yml up -d",
+    "docker_release_restart": "yarn docker_release_stop && yarn docker_release_start",
+    "docker_release": "yarn docker_release_build && yarn docker_release_restart",
 
     "docker_push": "yarn docker_prod_build && docker tag docker-hsl_bike_app joshuahsudo/hsl_bike_app:latest && docker push joshuahsudo/hsl_bike_app:latest"
   },
