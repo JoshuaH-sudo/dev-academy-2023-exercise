@@ -7,13 +7,27 @@ For explanations, instructions and more information, please see the [wiki](https
 ## Setup
 ### Prerequisites: 
 Have yarn and docker installed on your machine.
-This application was designed to mainly be run on a linux, WSL or equivelent OS/System
+This application was designed to mainly be run on a linux, WSL or equivalent OS/System
 
 ### Run locally from repo
 - Clone repo
+- Have a instance of mongo running.
 - Install dependencies: `yarn install`
-- Start app: `yarn docker`
-- Run tests: `yarn test`
+- Run `MONGO_URI=<mongo_uri> PORT=8080 yarn start`
+- Open browser [here](http://localhost:8080/)
+
+### Run docker stack from repo
+- Clone repo
+- Run either (will setup mongo database and run the app):
+  - The development version: `yarn docker_dev`
+  - The production version: `yarn docker_prod` 
+  - The full release version: `yarn docker_release`
+- Open browser [here](http://localhost:8080/)
+
+### Run tests
+- Run all tests: `yarn test`
+- Run frontend tests: `yarn frontend_test`
+- Run backend tests: `yarn frontend_test`
 
 ### Docker image
 ```
