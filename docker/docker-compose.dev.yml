@@ -13,7 +13,6 @@ services:
       - PORT=8080
       - NODE_ENV=development
       - MONGO_URI=mongodb://app_database:27017/dev-academy
-    command: yarn dev
     depends_on:
       - app_database
 

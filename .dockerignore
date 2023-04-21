@@ -10,6 +10,7 @@ docker
 test_datasets
 **/__mocks__
 **/__tests__
+src/client
 **/test_setup.ts
 **/*jest*
 coverage

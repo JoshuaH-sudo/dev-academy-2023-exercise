@@ -8,7 +8,7 @@ node_modules/
 coverage/
 globalConfig.json
 
-.env*
+*.env*
 .flaskenv*
 !.env.project
 !.env.vault
