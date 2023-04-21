@@ -7,6 +7,8 @@ RUN yarn install
 # Need this to decompress the dataset tar files
 RUN apt-get update
 RUN apt-get install bzip2
-
+RUN yarn build
 
 EXPOSE 8080
+
+CMD ["yarn", "start"]
