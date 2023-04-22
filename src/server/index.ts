@@ -34,7 +34,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "../../", "public")))
-app.use("/", expressStaticGzip(path.join(__dirname, "../../", "public", "dist"), {
+app.use("/files", expressStaticGzip(path.join(__dirname, "../../", "public"), {
  enableBrotli: true
 }));
 

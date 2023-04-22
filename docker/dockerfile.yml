@@ -9,11 +9,6 @@ RUN yarn install
 RUN apt-get update
 RUN apt-get install bzip2
 
-RUN yarn build
-# Remove all the files that are not needed for the final image
-RUN rm -rf src/client
-RUN rm -rf scripts
-
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["yarn", "start"]

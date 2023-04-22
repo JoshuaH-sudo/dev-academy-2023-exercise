@@ -13,5 +13,5 @@ if [ "$NODE_ENV" == "development" ]; then
 elif [ "$NODE_ENV" == "production" ]; then
   yarn webpack --config ./scripts/webpack/webpack.prod.js --mode production
 else
-  echo "Node build mode selected"
+  echo 'No build mode selected set the NODE_ENV variable to either "development" or "production"'
 fi

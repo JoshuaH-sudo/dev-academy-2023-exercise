@@ -7,8 +7,6 @@ services:
     working_dir: /home/node/app
     ports:
       - "8080:8080"
-    expose:
-      - "8081"
     environment:
       - PORT=8080
       - NODE_ENV=development

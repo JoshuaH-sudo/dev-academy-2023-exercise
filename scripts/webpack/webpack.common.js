@@ -25,7 +25,6 @@ module.exports = {
         test: /\.png$/,
         loader: "file-loader",
         options: {
-          outputPath: "../",
           name: "[name].[ext]",
         },
       },
@@ -35,13 +34,13 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    path: path.resolve(__dirname, "../../public", "dist"),
+    path: path.resolve(__dirname, "../../public"),
   },
   plugins: [
     //Will automatically attach the bundle to the index.html
     new HtmlWebpackPlugin({
       title: "Helsinki City Bike",
-      outputPath: "../",
+      publicPath: "/files",
       filename: "index.html",
       template: "./src/client/assets/index.html",
     }),
