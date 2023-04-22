@@ -2,7 +2,8 @@
 version: "3"
 services:
   hsl_bike_app:
-    # pulls the image from docker hub, does not use the local build image
+    # Pulls the image from docker hub, does not use the local build image
+    # This will ensure the same docker image is used everywhere.
     image: joshuahsudo/hsl_bike_app:latest
     working_dir: /home/node/app
     env_file: 

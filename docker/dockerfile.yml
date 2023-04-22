@@ -3,10 +3,16 @@ WORKDIR /home/node/app
 
 # Copy all files from the root directory
 COPY . .
-RUN yarn install --production
+RUN yarn install
 # Need this to decompress the dataset tar files
+# Do not want to decompress them and apply it to the final image
 RUN apt-get update
 RUN apt-get install bzip2
+
+RUN yarn build
+# Remove all the files that are not needed for the final image
+RUN rm -rf src/client
+RUN rm -rf scripts
 
 EXPOSE 3000
 

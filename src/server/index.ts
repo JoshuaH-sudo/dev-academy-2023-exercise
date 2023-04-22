@@ -48,7 +48,11 @@ app.use("/stations", station_router)
 async function start_database() {
   debugLog("Connecting to database")
 
-  debugLog(process.env.MONGO_URI)
+  if (process.env.MONGO_URI === undefined) {
+    errorLog("MONGO_URI is not defined, please define it via the MONGO_URI environment variable or in the .env file")
+    process.exit(1)
+  }
+
   await mongoose.connect(process.env.MONGO_URI)
 
   try {

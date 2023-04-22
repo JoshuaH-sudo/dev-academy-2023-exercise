@@ -2,6 +2,7 @@
 .nvmrc
 .prettierrc
 *.md
+*.csv
 
 public
 node_modules
@@ -10,14 +11,13 @@ docker
 test_datasets
 **/__mocks__
 **/__tests__
-src/client
 **/test_setup.ts
 **/*jest*
 coverage
 
 figma
 
-.env*
+*.env*
 .flaskenv*
 !.env.project
 !.env.vault
