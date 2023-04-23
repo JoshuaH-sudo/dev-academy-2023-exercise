@@ -12,7 +12,8 @@ RUN apt-get install bzip2
 RUN yarn prod_build
 # Remove unused files after client bundling
 RUN rm -rf src/client
-RUN rm -rf scripts
+RUN rm -rf scripts/webpack
+RUN rm -rf scripts/build.sh
 
 EXPOSE 8080
 
