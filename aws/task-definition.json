@@ -335,3 +335,67 @@ secrets:
   database_environment:
     name: hsl-app_database_environment
     file: /root/projects/dev-academy-2023-exercise/database.env
+name: hsl-app
+services:
+  app_database:
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "17179869184"
+    environment:
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_root_username
+    image: mongo
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 27017
+      published: "27017"
+      protocol: tcp
+    restart: always
+    secrets:
+    - source: db_root_username
+    - source: db_root_password
+    volumes:
+    - type: volume
+      source: mongo-data
+      target: /data/db
+      volume: {}
+  hsl_bike_app:
+    depends_on:
+      app_database:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "17179869184"
+    image: joshuahsudo/hsl_bike_app:latest
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 8080
+      published: "8080"
+      protocol: tcp
+    secrets:
+    - source: app_environment
+    working_dir: /home/node/app
+networks:
+  default:
+    name: hsl-app_default
+volumes:
+  mongo-data:
+    name: hsl-app_mongo-data
+secrets:
+  app_environment:
+    name: hsl-app_app_environment
+    file: /root/projects/dev-academy-2023-exercise/app.env
+  db_root_password:
+    name: hsl-app_db_root_password
+    file: /root/projects/dev-academy-2023-exercise/credentials/.db_root_password.env
+  db_root_username:
+    name: hsl-app_db_root_username
+    file: /root/projects/dev-academy-2023-exercise/credentials/.db_root_username.env

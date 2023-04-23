@@ -79,13 +79,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ./aws/task-definition.json
-          service: my-service
-          cluster: my-cluster
-          wait-for-service-stability: true
-
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: hsl-bike-app
           cluster: hsl-bike-app-cluster
+          wait-for-service-stability: true
