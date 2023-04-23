@@ -6,7 +6,7 @@
     "type_check": "tsc --noEmit",
     "get_datasets": "./scripts/extract_datasets.sh",
 
-    "test": "NODE_ENV=test && jest",
+    "test": "NODE_ENV=test jest",
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
 

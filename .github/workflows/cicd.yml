@@ -28,7 +28,9 @@ jobs:
         run: yarn install
 
       - name: Set NODE_ENV to test mode
-        run: echo "NODE_ENV=test" >> "$GITHUB_ENV"
+        run: |
+          echo "NODE_ENV=test" >> "$GITHUB_ENV"
+          echo $NODE_ENV
 
       - name: Run tests
         run: yarn test
