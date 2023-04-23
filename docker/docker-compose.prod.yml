@@ -4,7 +4,7 @@ services:
   hsl_bike_app:
     build:
       context: ../
-      dockerfile: ./docker/dockerfile.yml
+      dockerfile: ./docker/dockerfile.prod.yml
     working_dir: /home/node/app
     ports:
       - "8080:8080"

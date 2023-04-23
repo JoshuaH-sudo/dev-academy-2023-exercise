@@ -6,8 +6,6 @@
 
 node_modules
 docker
-# client src code is not needed since it is bundled and copied into the image
-src/client
 
 test_datasets
 **/__mocks__

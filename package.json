@@ -16,10 +16,10 @@
     "dev": "yarn dev_build && yarn start",
     "dev_build": "NODE_ENV=development yarn build",
     "docker_dev_stop": "docker-compose -f ./docker/docker-compose.dev.yml stop",
-    "docker_dev_build": "docker-compose -f ./docker/docker-compose.dev.yml build",
+    "docker_dev_build": "docker-compose -f ./docker/docker-compose.dev.yml build --no-cache --progress=plain",
     "docker_dev_start": "docker-compose -f ./docker/docker-compose.dev.yml up -d",
     "docker_dev_restart": "yarn docker_dev_stop && yarn docker_dev_start",
-    "docker_dev": "yarn type_check && yarn dev_build && yarn docker_dev_build && yarn docker_dev_restart",
+    "docker_dev": "yarn type_check && yarn docker_dev_build && yarn docker_dev_restart",
 
     "prod": "yarn prod_build && yarn start",
     "prod_build": "NODE_ENV=production yarn build",
@@ -27,7 +27,7 @@
     "docker_prod_build": "docker-compose -f ./docker/docker-compose.prod.yml build --no-cache",
     "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.yml up -d",
     "docker_prod_restart": "yarn docker_prod_stop && yarn docker_prod_start",
-    "docker_prod": "yarn type_check && yarn prod_build && yarn docker_prod_build && yarn docker_prod_restart",
+    "docker_prod": "yarn type_check && yarn docker_prod_build && yarn docker_prod_restart",
 
     "docker_release_stop": "docker-compose -f ./docker/docker-compose.release.yml stop",
     "docker_release_build": "docker-compose -f ./docker/docker-compose.release.yml build --no-cache",
