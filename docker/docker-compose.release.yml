@@ -8,8 +8,8 @@ services:
     working_dir: /home/node/app
     ports:
       - "8080:8080"
-    env_file: 
-      - ../.env
+    secrets:
+      - app_environment
     depends_on:
       - app_database
     deploy:
@@ -23,8 +23,8 @@ services:
     restart: always
     ports:
       - "27017:27017"
-    env_file: 
-      - ../database.env
+    secrets:
+      - database_environment
     volumes:
       - mongo-data:/data/db
     deploy:
@@ -32,5 +32,10 @@ services:
         limits:
           cpus: '2'
           memory: 16Gb
+secrets:
+  database_environment:
+    file: ../database.env
+  app_environment:
+    file: ../app.env
 volumes:
   mongo-data:

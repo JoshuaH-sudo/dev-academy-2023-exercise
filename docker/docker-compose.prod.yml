@@ -8,8 +8,8 @@ services:
     working_dir: /home/node/app
     ports:
       - "8080:8080"
-    env_file: 
-      - ../.env
+    secrets:
+      - app_environment
     depends_on:
       - app_database
 
@@ -18,9 +18,16 @@ services:
     restart: always
     env_file: 
       - ../database.env
+    # command: bash -c source /run/secrets/dabatase_environment
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+
+secrets:
+  database_environment:
+    file: ../database.env
+  app_environment:
+    file: ../app.env
 volumes:
   mongo-data:
