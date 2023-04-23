@@ -4,7 +4,7 @@
 
 For explanations, instructions and more information, please see the [wiki](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/wiki).
 
-See the live version of application, deployed on AWS ECS, [here](http://docke-loadb-1s0k0aqe98uqa-775cba9cf9f80be8.elb.ap-southeast-2.amazonaws.com:8080/)
+See the live version of application, deployed on AWS ECS, [here](http://hsl-a-loadb-3jijdle162p7-dee52880036e6179.elb.ap-southeast-2.amazonaws.com:8080/)
 ## Setup
 ### Prerequisites: 
 Have yarn and docker installed on your machine.
