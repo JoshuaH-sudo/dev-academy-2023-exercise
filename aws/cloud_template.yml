@@ -42,7 +42,7 @@ Resources:
           - Arn
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.service
         Value: app_database
       TaskDefinition:
@@ -81,7 +81,7 @@ Resources:
       Protocol: TCP
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       TargetType: ip
       VpcId: vpc-0184ca5a98b218c37
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -99,21 +99,19 @@ Resources:
               Ref: LogGroup
             awslogs-region:
               Ref: AWS::Region
-            awslogs-stream-prefix: hsl-app
+            awslogs-stream-prefix: hsl-bike-app
         MountPoints:
         - ContainerPath: /run/secrets/
           SourceVolume: secrets
         Name: Appdatabase_Secrets_InitContainer
         Secrets:
         - Name: db_root_username
-          ValueFrom:
-            Ref: HslappdbrootusernameSecret
+          ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG
         - Name: db_root_password
-          ValueFrom:
-            Ref: HslappdbrootpasswordSecret
+          ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE
       - Command:
         - ap-southeast-2.compute.internal
-        - hsl-app.local
+        - hsl-bike-app.local
         Essential: false
         Image: docker/ecs-searchdomain-sidecar:1.0
         LogConfiguration:
@@ -123,7 +121,7 @@ Resources:
               Ref: LogGroup
             awslogs-region:
               Ref: AWS::Region
-            awslogs-stream-prefix: hsl-app
+            awslogs-stream-prefix: hsl-bike-app
         Name: Appdatabase_ResolvConf_InitContainer
       - DependsOn:
         - Condition: SUCCESS
@@ -145,7 +143,7 @@ Resources:
               Ref: LogGroup
             awslogs-region:
               Ref: AWS::Region
-            awslogs-stream-prefix: hsl-app
+            awslogs-stream-prefix: hsl-bike-app
         MountPoints:
         - ContainerPath: /run/secrets/
           ReadOnly: true
@@ -160,7 +158,7 @@ Resources:
       Cpu: "2048"
       ExecutionRoleArn:
         Ref: AppdatabaseTaskExecutionRole
-      Family: hsl-app-app_database
+      Family: hsl-bike-app-app_database
       Memory: "16384"
       NetworkMode: awsvpc
       RequiresCompatibilities:
@@ -174,7 +172,7 @@ Resources:
             AccessPointId:
               Ref: MongodataAccessPoint
             IAM: ENABLED
-          FilesystemId: fs-0ddc1010ec9b6e389
+          FilesystemId: fs-06ad7853c85e5b5d3
           TransitEncryption: ENABLED
         Name: mongo-data
     Type: AWS::ECS::TaskDefinition
@@ -203,12 +201,12 @@ Resources:
             Effect: Allow
             Principal: {}
             Resource:
-            - Ref: HslappdbrootusernameSecret
-            - Ref: HslappdbrootpasswordSecret
+            - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG
+            - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE
         PolicyName: app_databaseGrantAccessToSecrets
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.service
         Value: app_database
     Type: AWS::IAM::Role
@@ -237,27 +235,27 @@ Resources:
             Effect: Allow
             Principal: {}
             Resource:
-            - arn:aws:elasticfilesystem:ap-southeast-2:788286108805:file-system/fs-0ddc1010ec9b6e389
+            - arn:aws:elasticfilesystem:ap-southeast-2:788286108805:file-system/fs-06ad7853c85e5b5d3
           Version: 2012-10-17
         PolicyName: AppdatabaseMongodataVolumeMountPolicy
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.service
         Value: app_database
     Type: AWS::IAM::Role
   CloudMap:
     Properties:
-      Description: Service Map for Docker Compose project hsl-app
-      Name: hsl-app.local
+      Description: Service Map for Docker Compose project hsl-bike-app
+      Name: hsl-bike-app.local
       Vpc: vpc-0184ca5a98b218c37
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
   Cluster:
     Properties:
-      ClusterName: hsl-app
+      ClusterName: hsl-bike-app
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
     Type: AWS::ECS::Cluster
   Default8080Ingress:
     Properties:
@@ -281,12 +279,12 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   DefaultNetwork:
     Properties:
-      GroupDescription: hsl-app Security Group for default network
+      GroupDescription: hsl-bike-app Security Group for default network
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.network
-        Value: hsl-app_default
+        Value: hsl-bike-app_default
       VpcId: vpc-0184ca5a98b218c37
     Type: AWS::EC2::SecurityGroup
   DefaultNetworkIngress:
@@ -298,33 +296,6 @@ Resources:
       SourceSecurityGroupId:
         Ref: DefaultNetwork
     Type: AWS::EC2::SecurityGroupIngress
-  HslappappenvironmentSecret:
-    Properties:
-      Description: Secret hsl-app_app_environment
-      SecretString: |
-        NODE_ENV=production
-        MONGO_URI=mongodb://admin:ybALxfKcyxtzCTpaecmnteixuhCQzxG@app_database:27017/?authMechanism=DEFAULT
-        PORT=8080
-      Tags:
-      - Key: com.docker.compose.project
-        Value: hsl-app
-    Type: AWS::SecretsManager::Secret
-  HslappdbrootpasswordSecret:
-    Properties:
-      Description: Secret hsl-app_db_root_password
-      SecretString: ybALxfKcyxtzCTpaecmnteixuhCQzxG
-      Tags:
-      - Key: com.docker.compose.project
-        Value: hsl-app
-    Type: AWS::SecretsManager::Secret
-  HslappdbrootusernameSecret:
-    Properties:
-      Description: Secret hsl-app_db_root_username
-      SecretString: admin
-      Tags:
-      - Key: com.docker.compose.project
-        Value: hsl-app
-    Type: AWS::SecretsManager::Secret
   HslbikeappService:
     DependsOn:
     - HslbikeappTCP8080Listener
@@ -365,7 +336,7 @@ Resources:
           - Arn
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.service
         Value: hsl_bike_app
       TaskDefinition:
@@ -404,7 +375,7 @@ Resources:
       Protocol: TCP
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       TargetType: ip
       VpcId: vpc-0184ca5a98b218c37
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -422,18 +393,17 @@ Resources:
               Ref: LogGroup
             awslogs-region:
               Ref: AWS::Region
-            awslogs-stream-prefix: hsl-app
+            awslogs-stream-prefix: hsl-bike-app
         MountPoints:
         - ContainerPath: /run/secrets/
           SourceVolume: secrets
         Name: Hslbikeapp_Secrets_InitContainer
         Secrets:
         - Name: app_environment
-          ValueFrom:
-            Ref: HslappappenvironmentSecret
+          ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
       - Command:
         - ap-southeast-2.compute.internal
-        - hsl-app.local
+        - hsl-bike-app.local
         Essential: false
         Image: docker/ecs-searchdomain-sidecar:1.0
         LogConfiguration:
@@ -443,7 +413,7 @@ Resources:
               Ref: LogGroup
             awslogs-region:
               Ref: AWS::Region
-            awslogs-stream-prefix: hsl-app
+            awslogs-stream-prefix: hsl-bike-app
         Name: Hslbikeapp_ResolvConf_InitContainer
       - DependsOn:
         - Condition: SUCCESS
@@ -460,7 +430,7 @@ Resources:
               Ref: LogGroup
             awslogs-region:
               Ref: AWS::Region
-            awslogs-stream-prefix: hsl-app
+            awslogs-stream-prefix: hsl-bike-app
         MountPoints:
         - ContainerPath: /run/secrets/
           ReadOnly: true
@@ -474,7 +444,7 @@ Resources:
       Cpu: "2048"
       ExecutionRoleArn:
         Ref: HslbikeappTaskExecutionRole
-      Family: hsl-app-hsl_bike_app
+      Family: hsl-bike-app-hsl_bike_app
       Memory: "16384"
       NetworkMode: awsvpc
       RequiresCompatibilities:
@@ -507,11 +477,11 @@ Resources:
             Effect: Allow
             Principal: {}
             Resource:
-            - Ref: HslappappenvironmentSecret
+            - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
         PolicyName: hsl_bike_appGrantAccessToSecrets
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.service
         Value: hsl_bike_app
     Type: AWS::IAM::Role
@@ -527,41 +497,41 @@ Resources:
       - subnet-09df8bdf6bc065650
       Tags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       Type: network
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
   LogGroup:
     Properties:
-      LogGroupName: /docker-compose/hsl-app
+      LogGroupName: /docker-compose/hsl-bike-app
     Type: AWS::Logs::LogGroup
   MongodataAccessPoint:
     Properties:
       AccessPointTags:
       - Key: com.docker.compose.project
-        Value: hsl-app
+        Value: hsl-bike-app
       - Key: com.docker.compose.volume
         Value: mongo-data
       - Key: Name
-        Value: hsl-app_mongo-data
-      FileSystemId: fs-0ddc1010ec9b6e389
+        Value: hsl-bike-app_mongo-data
+      FileSystemId: fs-06ad7853c85e5b5d3
     Type: AWS::EFS::AccessPoint
   MongodataNFSMountTargetOnSubnet05b198577868ae8e3:
     Properties:
-      FileSystemId: fs-0ddc1010ec9b6e389
+      FileSystemId: fs-06ad7853c85e5b5d3
       SecurityGroups:
       - Ref: DefaultNetwork
       SubnetId: subnet-05b198577868ae8e3
     Type: AWS::EFS::MountTarget
   MongodataNFSMountTargetOnSubnet09df8bdf6bc065650:
     Properties:
-      FileSystemId: fs-0ddc1010ec9b6e389
+      FileSystemId: fs-06ad7853c85e5b5d3
       SecurityGroups:
       - Ref: DefaultNetwork
       SubnetId: subnet-09df8bdf6bc065650
     Type: AWS::EFS::MountTarget
   MongodataNFSMountTargetOnSubnet0d00ccf5f1b79ba4a:
     Properties:
-      FileSystemId: fs-0ddc1010ec9b6e389
+      FileSystemId: fs-06ad7853c85e5b5d3
       SecurityGroups:
       - Ref: DefaultNetwork
       SubnetId: subnet-0d00ccf5f1b79ba4a

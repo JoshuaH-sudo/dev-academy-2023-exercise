@@ -75,10 +75,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
 
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Upload cloud formation stack to ECS
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          task-definition: ./aws/task-definition.json
-          service: hsl-bike-app
-          cluster: hsl-bike-app-cluster
-          wait-for-service-stability: true
+          name: hsl-bike-app
+          template: ../aws/cloud_template.yaml

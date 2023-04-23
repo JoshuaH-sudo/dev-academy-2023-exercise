@@ -1,21 +1,21 @@
 FROM node:gallium-bullseye-slim
 WORKDIR /home/node/app
 
-# Copy all files from the root directory
+# Copy all files from the root directory.
 COPY . .
 RUN yarn install
-# # Need this to decompress the dataset tar files
-# # Do not want to decompress them and apply it to the final image
+# Need this to decompress the dataset tar files.
+# Do not want to decompress them and apply it to the final image.
 RUN apt-get update
 RUN apt-get install bzip2
 
 RUN yarn prod_build
-# # Remove unused files after client bundling
+# Remove unused files after client bundling.
 RUN rm -rf src/client
 RUN rm -rf scripts/webpack
 RUN rm -rf scripts/build.sh
 RUN rm -rf scripts/create_task_definition.sh
 
 EXPOSE 8080
-# run command to export secrets
+# run command to copy secrets to app before starting.
 CMD ["bash", "-c", "cp /run/secrets/app_environment /home/node/app/.env && yarn start"]

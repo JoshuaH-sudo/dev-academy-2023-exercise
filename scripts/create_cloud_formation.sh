@@ -19,5 +19,5 @@ if [ -z "$DOCKER_CONTEXT" ]; then
   exit 1
 fi
 
-rm -f ./aws/task-definition.json
-docker-compose --context $DOCKER_CONTEXT -f ./docker/docker-compose.release.yml -p hsl-app convert >> ./aws/task-definition.json
+rm -f ./aws/cloud_template.yml
+docker-compose --context $DOCKER_CONTEXT -f ./docker/docker-compose.release.yml -p hsl-bike-app convert >> ./aws/cloud_template.yml
