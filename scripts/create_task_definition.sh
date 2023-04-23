@@ -14,5 +14,10 @@ if [ -z "$AWS_DEFAULT_REGION" ]; then
   exit 1
 fi
 
+if [ -z "$DOCKER_CONTEXT" ]; then
+  echo "DOCKER_CONTEXT is not defined, set the correct ECS docker context"
+  exit 1
+fi
+
 rm -f ./aws/task-definition.json
-docker-compose -f ./docker/docker-compose.release.yml -p hsl-app convert >> ./aws/task-definition.json
+docker-compose --context $DOCKER_CONTEXT -f ./docker/docker-compose.release.yml -p hsl-app convert >> ./aws/task-definition.json
