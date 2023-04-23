@@ -79,4 +79,4 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: hsl-bike-app
-          template: ./aws/cloud_template.yaml
+          template: ./aws/cloud_template.yml
