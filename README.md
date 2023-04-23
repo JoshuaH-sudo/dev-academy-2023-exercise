@@ -29,6 +29,8 @@ This application was designed to mainly be run on a linux, WSL or equivalent OS/
 - Run all tests: `yarn test`
 - Run frontend tests: `yarn frontend_test`
 - Run backend tests: `yarn frontend_test`
+  
+*Please note: that there are current problems with mongoDB's support for Ubuntu 22.04 so backend tests may not be runnable see issue [here](https://github.com/nodkz/mongodb-memory-server/issues/732) and [here](https://github.com/shelfio/jest-mongodb/issues/351)*
 
 ### Docker image
 ```
