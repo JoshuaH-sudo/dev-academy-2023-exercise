@@ -6,10 +6,13 @@ services:
       context: ../
       dockerfile: ./docker/dockerfile.prod.yml
     working_dir: /home/node/app
+    environment:
+      - MONGO_URI_FILE=/run/secrets/db_mongo_uri
     ports:
       - "8080:8080"
     secrets:
       - app_environment
+      - db_mongo_uri
     depends_on:
       - app_database
 
@@ -34,5 +37,7 @@ secrets:
     file: ../credentials/.db_root_password.env
   app_environment:
     file: ../app.env
+  db_mongo_uri:
+    file: ../credentials/.db_mongo_uri.env
 volumes:
   mongo-data:

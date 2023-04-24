@@ -9,7 +9,8 @@ RUN yarn install
 RUN apt-get update
 RUN apt-get install bzip2
 
-RUN yarn prod_build
+RUN yarn dev_build
+# prod_build
 # Remove unused files after client bundling.
 RUN rm -rf src/client
 RUN rm -rf scripts/webpack

@@ -5,10 +5,13 @@ services:
     # Pulls the image from docker hub, does not use the local build image.
     image: joshuahsudo/hsl_bike_app:latest
     working_dir: /home/node/app
+    environment:
+      - MONGO_URI_FILE=/run/secrets/db_mongo_uri
     ports:
       - "8080:8080"
     secrets:
       - app_environment
+      - db_mongo_uri
     depends_on:
       - app_database
     deploy:
@@ -43,6 +46,8 @@ secrets:
     name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE"
     external: true
   app_environment:
+    file: ./app.env
+  db_mongo_uri:
     name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5"
     external: true
 volumes:
