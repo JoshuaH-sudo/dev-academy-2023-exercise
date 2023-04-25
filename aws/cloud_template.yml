@@ -89,7 +89,7 @@ Resources:
     Properties:
       ContainerDefinitions:
       - Command:
-        - '[{"Name":"db_root_username","Keys":null},{"Name":"db_root_password","Keys":null}]'
+        - '[{"Name":"db_username","Keys":null},{"Name":"db_password","Keys":null}]'
         Essential: false
         Image: docker/ecs-secrets-sidecar:1.0
         LogConfiguration:
@@ -105,9 +105,9 @@ Resources:
           SourceVolume: secrets
         Name: Appdatabase_Secrets_InitContainer
         Secrets:
-        - Name: db_root_username
+        - Name: db_username
           ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG
-        - Name: db_root_password
+        - Name: db_password
           ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE
       - Command:
         - ap-southeast-2.compute.internal
@@ -130,9 +130,9 @@ Resources:
           ContainerName: Appdatabase_ResolvConf_InitContainer
         Environment:
         - Name: MONGO_INITDB_ROOT_PASSWORD_FILE
-          Value: /run/secrets/db_root_password
+          Value: /run/secrets/db_password
         - Name: MONGO_INITDB_ROOT_USERNAME_FILE
-          Value: /run/secrets/db_root_username
+          Value: /run/secrets/db_username
         Essential: true
         Image: docker.io/library/mongo:latest@sha256:9c8a0a019671ed7d402768d4df6dddcc898828e21e9f7b90a34b55fe8ca676ac
         LinuxParameters: {}
@@ -383,7 +383,7 @@ Resources:
     Properties:
       ContainerDefinitions:
       - Command:
-        - '[{"Name":"app_environment","Keys":null}]'
+        - '[{"Name":"db_mongo_uri","Keys":null}]'
         Essential: false
         Image: docker/ecs-secrets-sidecar:1.0
         LogConfiguration:
@@ -399,7 +399,7 @@ Resources:
           SourceVolume: secrets
         Name: Hslbikeapp_Secrets_InitContainer
         Secrets:
-        - Name: app_environment
+        - Name: db_mongo_uri
           ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
       - Command:
         - ap-southeast-2.compute.internal
@@ -420,6 +420,13 @@ Resources:
           ContainerName: Hslbikeapp_Secrets_InitContainer
         - Condition: SUCCESS
           ContainerName: Hslbikeapp_ResolvConf_InitContainer
+        Environment:
+        - Name: MONGO_URI_FILE
+          Value: /run/secrets/db_mongo_uri
+        - Name: NODE_ENV
+          Value: production
+        - Name: PORT
+          Value: "8080"
         Essential: true
         Image: docker.io/joshuahsudo/hsl_bike_app:latest@sha256:4e2bc2d593881f4aa7cddc05cc8e72ae62f677403e2e6b65badca12451b285ab
         LinuxParameters: {}

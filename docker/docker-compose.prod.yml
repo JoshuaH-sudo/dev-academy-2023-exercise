@@ -22,22 +22,22 @@ services:
     image: mongo
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/db_root_username
-      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/db_username
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/db_password
     ports:
       - "27017:27017"
     secrets:
-      - db_root_username
-      - db_root_password
+      - db_username
+      - db_password
     volumes:
       - mongo-data:/data/db
 
 secrets:
-  db_root_username:
-    file: ../environment/.db_root_username.env
-  db_root_password:
-    file: ../environment/.db_root_password.env
+  db_username:
+    file: ../environment/db_root_username.env
+  db_password:
+    file: ../environment/db_root_password.env
   db_mongo_uri:
-    file: ../environment/.db_mongo_uri.env
+    file: ../environment/db_mongo_uri.env
 volumes:
   mongo-data:

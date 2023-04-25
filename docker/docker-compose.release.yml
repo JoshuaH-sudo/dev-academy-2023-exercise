@@ -25,13 +25,13 @@ services:
     image: mongo
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/db_root_username
-      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/db_username
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/db_password
     ports:
       - "27017:27017"
     secrets:
-      - db_root_username
-      - db_root_password
+      - db_username
+      - db_password
     volumes:
       - mongo-data:/data/db
     deploy:
@@ -41,10 +41,10 @@ services:
           memory: 16Gb
 secrets:
   # Setting the secrets to external means that the secrets are not stored in the docker-compose file and cloud formation.
-  db_root_username:
+  db_username:
     name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG"
     external: true
-  db_root_password:
+  db_password:
     name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE"
     external: true
   db_mongo_uri:

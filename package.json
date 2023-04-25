@@ -35,7 +35,8 @@
     "docker_release_restart": "yarn docker_release_stop && yarn docker_release_start",
     "docker_release": "yarn docker_release_build && yarn docker_release_restart",
 
-    "docker_push": "docker tag docker-hsl_bike_app joshuahsudo/hsl_bike_app:latest && docker push joshuahsudo/hsl_bike_app:latest"
+    "docker_push": "docker tag docker-hsl_bike_app joshuahsudo/hsl_bike_app:latest && docker push joshuahsudo/hsl_bike_app:latest",
+    "create_esc_definition": "./scripts/create_cloud_formation.sh"
   },
   "dependencies": {
     "@elastic/charts": "^55.0.0",
