@@ -428,7 +428,7 @@ Resources:
         - Name: PORT
           Value: "8080"
         Essential: true
-        Image: docker.io/joshuahsudo/hsl_bike_app:latest@sha256:6e03a4aa6817db8ee7e10ab4f9f4c325f077e6e61b07d3e57c3ce934af9d9615
+        Image: docker.io/joshuahsudo/hsl_bike_app:latest
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
