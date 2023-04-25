@@ -54,8 +54,6 @@ async function start_database() {
 
   const mongo_uri = await get_mongo_uri()
 
-  debugLog("Database URI: " + mongo_uri)
-
   await mongoose.connect(mongo_uri)
 
   try {
