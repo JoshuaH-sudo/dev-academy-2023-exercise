@@ -10,13 +10,13 @@ RUN apt-get update
 RUN apt-get install bzip2
 
 RUN yarn dev_build
-# prod_build
+# RUN yarn prod_build
 # Remove unused files after client bundling.
 RUN rm -rf src/client
 RUN rm -rf scripts/webpack
 RUN rm -rf scripts/build.sh
-RUN rm -rf scripts/create_task_definition.sh
+RUN rm -rf scripts/create_cloud_formation.sh
 
 EXPOSE 8080
 # run command to copy secrets to app before starting.
-CMD ["bash", "-c", "cp /run/secrets/app_environment /home/node/app/.env && yarn start"]
+CMD ["yarn", "start"]

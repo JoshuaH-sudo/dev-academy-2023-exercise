@@ -5,6 +5,7 @@
 *.csv
 
 node_modules
+public
 docker
 
 test_datasets
