@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   # Parameter for database username
-  DB_USERNAME:
+  DBUsername:
     Type: String
     Default: test
   # Parameter for database password
-  DB_PASSWORD:
+  DBPassword:
     Type: String
     Default: test
-  DB_MONGO_URI:
+  DBMongoUri:
     Type: String
     Default: mongodb://test:test@app_database:27017/hsl_bike_app
 Resources:
@@ -122,10 +122,10 @@ Resources:
               Value: hsl_bike_app
             - Name: MONGO_INITDB_ROOT_PASSWORD
               Value:
-                Ref: DB_PASSWORD
+                Ref: DBPassword
             - Name: MONGO_INITDB_ROOT_USERNAME
               Value:
-                Ref: DB_USERNAME
+                Ref: DBUsername
           Essential: true
           Image: docker.io/library/mongo:latest@sha256:9c8a0a019671ed7d402768d4df6dddcc898828e21e9f7b90a34b55fe8ca676ac
           LinuxParameters: {}
@@ -377,7 +377,7 @@ Resources:
           Environment:
             - Name: MONGO_URI
               Value:
-                Ref: DB_MONGO_URI
+                Ref: DBMongoUri
             - Name: NODE_ENV
               Value: production
             - Name: PORT
