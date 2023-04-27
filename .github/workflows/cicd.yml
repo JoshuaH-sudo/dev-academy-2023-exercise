@@ -84,8 +84,10 @@ jobs:
           name: hsl-bike-app
           template: ./aws/cloud_template.yml
           # override the environment variables for mongo 
-          parameter-override: >-
-            MONGO_INITDB_ROOT_USERNAME=${{ secrets.DB_USERNAME }},
-            MONGO_INITDB_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }}
+          parameter-overrides: >-
+            DB_USERNAME=${{ secrets.DB_USERNAME }},
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }},
+            DB_MONGO_URI=${{ secrets.DB_MONGO_URI }}
+
 
           

@@ -8,11 +8,9 @@ services:
     environment:
       PORT: 8080
       NODE_ENV: production
-      MONGO_URI_FILE: /run/secrets/db_mongo_uri
+      MONGO_URI: mongodb://placeholder:placeholder@app_database:27017/hsl_bike_app
     ports:
       - "8080:8080"
-    secrets:
-      - db_mongo_uri
     depends_on:
       - app_database
     deploy:
@@ -25,7 +23,9 @@ services:
     image: mongo
     restart: always
     environment:
-      # Username and password will be set in the cloud template.
+      # This will be overriden in the github actions.
+      MONGO_INITDB_ROOT_USERNAME: placeholder
+      MONGO_INITDB_ROOT_PASSWORD: placeholder
       MONGO_INITDB_DATABASE: hsl_bike_app
     ports:
       - "27017:27017"
@@ -36,10 +36,5 @@ services:
         limits:
           cpus: '2'
           memory: 16Gb
-secrets:
-  # Setting the secrets to external means that the secrets are not stored in the docker-compose file and cloud formation.
-  db_mongo_uri:
-    name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5"
-    external: true
 volumes:
   mongo-data:

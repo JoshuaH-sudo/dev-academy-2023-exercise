@@ -8,6 +8,9 @@ Parameters:
   DB_PASSWORD:
     Type: String
     Default: test
+  DB_MONGO_URI:
+    Type: String
+    Default: mongodb://test:test@app_database:27017/hsl_bike_app
 Resources:
   AppdatabaseService:
     DependsOn:
@@ -355,25 +358,6 @@ Resources:
     Properties:
       ContainerDefinitions:
         - Command:
-            - '[{"Name":"db_mongo_uri","Keys":null}]'
-          Essential: false
-          Image: docker/ecs-secrets-sidecar:1.0
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroup
-              awslogs-region:
-                Ref: AWS::Region
-              awslogs-stream-prefix: hsl-bike-app
-          MountPoints:
-            - ContainerPath: /run/secrets/
-              SourceVolume: secrets
-          Name: Hslbikeapp_Secrets_InitContainer
-          Secrets:
-            - Name: db_mongo_uri
-              ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
-        - Command:
             - ap-southeast-2.compute.internal
             - hsl-bike-app.local
           Essential: false
@@ -389,12 +373,11 @@ Resources:
           Name: Hslbikeapp_ResolvConf_InitContainer
         - DependsOn:
             - Condition: SUCCESS
-              ContainerName: Hslbikeapp_Secrets_InitContainer
-            - Condition: SUCCESS
               ContainerName: Hslbikeapp_ResolvConf_InitContainer
           Environment:
-            - Name: MONGO_URI_FILE
-              Value: /run/secrets/db_mongo_uri
+            - Name: MONGO_URI
+              Value:
+                Ref: DB_MONGO_URI
             - Name: NODE_ENV
               Value: production
             - Name: PORT
@@ -410,10 +393,6 @@ Resources:
               awslogs-region:
                 Ref: AWS::Region
               awslogs-stream-prefix: hsl-bike-app
-          MountPoints:
-            - ContainerPath: /run/secrets/
-              ReadOnly: true
-              SourceVolume: secrets
           Name: hsl_bike_app
           PortMappings:
             - ContainerPort: 8080
@@ -428,8 +407,6 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      Volumes:
-        - Name: secrets
     Type: AWS::ECS::TaskDefinition
   HslbikeappTaskExecutionRole:
     Properties:
@@ -445,19 +422,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-      Policies:
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - secretsmanager:GetSecretValue
-                  - ssm:GetParameters
-                  - kms:Decrypt
-                Condition: {}
-                Effect: Allow
-                Principal: {}
-                Resource:
-                  - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
-          PolicyName: hsl_bike_appGrantAccessToSecrets
       Tags:
         - Key: com.docker.compose.project
           Value: hsl-bike-app
