@@ -85,9 +85,9 @@ jobs:
           template: ./aws/cloud_template.yml
           # override the environment variables for mongo 
           parameter-overrides: >-
-            DB_USERNAME=${{ secrets.DB_USERNAME }},
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }},
-            DB_MONGO_URI=${{ secrets.DB_MONGO_URI }}
+            DBUsername=${{ secrets.DB_USERNAME }},
+            DBPassword=${{ secrets.DB_PASSWORD }},
+            DBMongoUri=${{ secrets.DB_MONGO_URI }}
 
 
           
