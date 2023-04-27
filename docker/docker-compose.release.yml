@@ -25,9 +25,7 @@ services:
     image: mongo
     restart: always
     environment:
-      # This will be overriden in the github actions.
-      MONGO_INITDB_ROOT_USERNAME: "test"
-      MONGO_INITDB_ROOT_PASSWORD: "test"
+      # Username and password will be set in the cloud template.
       MONGO_INITDB_DATABASE: hsl_bike_app
     ports:
       - "27017:27017"
