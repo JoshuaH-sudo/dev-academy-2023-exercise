@@ -10,7 +10,8 @@ Parameters:
     Default: test
   DBMongoUri:
     Type: String
-    Default: mongodb://test:test@app_database:27017/hsl_bike_app
+    # Default: mongodb://test:test@app_database:27017/hsl_bike_app
+    Default: mongodb://app_database:27017/
 Resources:
   AppdatabaseService:
     DependsOn:
@@ -118,14 +119,14 @@ Resources:
             - Condition: SUCCESS
               ContainerName: Appdatabase_ResolvConf_InitContainer
           Environment:
-            - Name: MONGO_INITDB_DATABASE
-              Value: hsl_bike_app
-            - Name: MONGO_INITDB_ROOT_PASSWORD
-              Value:
-                Ref: DBPassword
-            - Name: MONGO_INITDB_ROOT_USERNAME
-              Value:
-                Ref: DBUsername
+            # - Name: MONGO_INITDB_DATABASE
+            #   Value: hsl_bike_app
+            # - Name: MONGO_INITDB_ROOT_PASSWORD
+            #   Value:
+            #     Ref: DBPassword
+            # - Name: MONGO_INITDB_ROOT_USERNAME
+            #   Value:
+            #     Ref: DBUsername
           Essential: true
           Image: docker.io/library/mongo:latest@sha256:9c8a0a019671ed7d402768d4df6dddcc898828e21e9f7b90a34b55fe8ca676ac
           LinuxParameters: {}
