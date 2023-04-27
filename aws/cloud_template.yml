@@ -119,8 +119,8 @@ Resources:
             - Condition: SUCCESS
               ContainerName: Appdatabase_ResolvConf_InitContainer
           Environment:
-            # - Name: MONGO_INITDB_DATABASE
-            #   Value: hsl_bike_app
+            - Name: MONGO_INITDB_DATABASE
+              Value: hsl_bike_app
             # - Name: MONGO_INITDB_ROOT_PASSWORD
             #   Value:
             #     Ref: DBPassword
