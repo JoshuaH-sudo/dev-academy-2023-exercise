@@ -19,6 +19,6 @@ services:
       
 secrets:
   db_mongo_uri:
-    file: ../environment/db_mongo_uri.env
+    file: ../environment/atlas_mongo_uri.env
 volumes:
   mongo-data:
