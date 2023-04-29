@@ -40,6 +40,8 @@ jobs:
   push-docker-image:
     needs: run-tests
     runs-on: ubuntu-latest
+    outputs:
+      image-digest: ${{ steps.docker_build_push.outputs.digest }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -54,7 +56,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
-        id: docker_build_push
+        id: docker-build-push
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -82,4 +84,4 @@ jobs:
         with:
           name: hsl-bike-app
           template: ./aws/cloud_template.yml
-          parameter-overrides: "HslbikeappImage=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hsl_bike_app:latest@${{ docker_build_push.outputs.digest }}"
+          parameter-overrides: "HslbikeappImage=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hsl_bike_app:latest@${{ needs.push-docker-image.outputs.image-digest }}"
