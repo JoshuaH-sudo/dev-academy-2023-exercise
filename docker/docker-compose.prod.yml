@@ -16,30 +16,8 @@ services:
       - "8080:8080"
     secrets:
       - db_mongo_uri
-    depends_on:
-      - app_database
-
-  app_database:
-    container_name: app_database
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
-      MONGO_INITDB_DATABASE: hsl_bike_app
-    ports:
-      - "27017:27017"
-    secrets:
-      - db_username
-      - db_password
-    volumes:
-      - mongo-data:/data/db
-
+      
 secrets:
-  db_username:
-    file: ../environment/db_root_username.env
-  db_password:
-    file: ../environment/db_root_password.env
   db_mongo_uri:
     file: ../environment/db_mongo_uri.env
 volumes:

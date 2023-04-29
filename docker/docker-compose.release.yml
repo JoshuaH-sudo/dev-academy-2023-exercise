@@ -2,6 +2,7 @@
 version: "3.8"
 services:
   hsl_bike_app:
+    container_name: hsl_bike_app
     # Pulls the image from docker hub, does not use the local build image.
     image: joshuahsudo/hsl_bike_app:latest
     working_dir: /home/node/app
@@ -13,41 +14,14 @@ services:
       - "8080:8080"
     secrets:
       - db_mongo_uri
-    depends_on:
-      - app_database
     deploy:
       resources:
         limits:
           cpus: '2'
           memory: 16Gb
 
-  app_database:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
-      MONGO_INITDB_DATABASE: hsl_bike_app
-    ports:
-      - "27017:27017"
-    secrets:
-      - db_username
-      - db_password
-    volumes:
-      - mongo-data:/data/db
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 16Gb
 secrets:
   # Setting the secrets to external means that the secrets are not stored in the docker-compose file and cloud formation.
-  db_username:
-    name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG"
-    external: true
-  db_password:
-    name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE"
-    external: true
   db_mongo_uri:
     name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5"
     external: true

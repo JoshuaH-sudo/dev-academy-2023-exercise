@@ -24,14 +24,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
-      MONGO_INITDB_DATABASE: hsl_bike_app
     secrets:
       - db_username
       - db_password
     ports:
       - "27017:27017"
     volumes:
-      - ../scripts/mongo/create_user.js:/docker-entrypoint-initdb.d/create_user.js:ro
       - mongo-data:/data/db
 secrets:
   db_username:
