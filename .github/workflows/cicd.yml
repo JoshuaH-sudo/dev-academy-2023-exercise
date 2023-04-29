@@ -2,13 +2,16 @@ name: CI/CD
 run-name: CI/CD process
 
 on:
-  [push]
-  # pull_request:
-  #   branches:
-  #     - main
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
 
 jobs:
   run-tests:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     strategy:
@@ -38,6 +41,7 @@ jobs:
           files: ./coverage/clover.xml
 
   push-docker-image:
+    if: github.event_name == 'push'
     needs: run-tests
     runs-on: ubuntu-latest
     outputs:
@@ -63,9 +67,10 @@ jobs:
           file: ./docker/dockerfile.prod.yml
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/hsl_bike_app:latest
-          
 
   deploy-to-AWS-ECS:
+    # Only deploy to AWS when a push event occurs
+    if: github.event_name == 'push'
     needs: push-docker-image
     runs-on: ubuntu-latest
     steps:
