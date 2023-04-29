@@ -120,8 +120,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
         //save the data to the database
         await save_journey_data(results)
 
-        file_line = file_line + 1
-        await update_journey_config(file_line)
+        await update_journey_config_file_line()
       }
     })
 
@@ -130,6 +129,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     })
 
     parser.on("skip", (error) => {
+      update_journey_config_file_line()
       // errorLog("Skipping line in csv file due to error :", error.message)
     })
 
@@ -142,12 +142,12 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
   })
 }
 
-export const update_journey_config = async (line: number) => {
-  debugLog(`Updating journey config to line ${line}`)
+export const update_journey_config_file_line = async () => {
   try {
     const config = await get_config()
 
-    config.current_line = line
+    config.current_line = config.current_line + 1
+    debugLog(`Updating journey config to line ${config.current_line}`)
 
     await config.save()
   } catch (error) {

@@ -62,8 +62,6 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
     //Feature: Validate data before importing
     parser.on("readable", async () => {
       let record: Station_csv_data
-      let file_line = station_config.current_line
-
       while ((record = parser.read()) !== null) {
         //Validating the data from the csv file.
         const Station_csv_data_validation = csv_station_schema.validate(record)
@@ -95,9 +93,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
 
         //save the data to the database
         await save_station_data(results)
-
-        file_line = file_line + 1
-        await update_station_config(file_line)
+        await update_station_config_file_line()
       }
     })
 
@@ -105,7 +101,8 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
       resolve()
     })
 
-    parser.on("skip", (error) => {
+    parser.on("skip", async (error) => {
+      await update_station_config_file_line()
       // errorLog("Skipping line in csv file due to error :", error.message)
     })
 
@@ -118,12 +115,12 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
   })
 }
 
-export const update_station_config = async (line: number) => {
-  debugLog(`Updating station config to line ${line}`)
+export const update_station_config_file_line = async () => {
   try {
     const config = await get_config()
 
-    config.current_line = line
+    config.current_line = config.current_line + 1
+    debugLog(`Updating station config to line ${config.current_line}`)
 
     await config.save()
   } catch (error) {
