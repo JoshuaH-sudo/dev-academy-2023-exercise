@@ -169,6 +169,8 @@ const Journey_view = () => {
           columns={columns}
           pagination={pagination}
           onChange={({ page: { index, size }, sort }) => {
+            //Prevent multiple requests when interacting with table
+            if (is_loading) return
             set_pagination({ ...pagination, pageIndex: index, pageSize: size })
             if (sort) {
               set_sorting({ sort: { field: sort.field, direction: sort.direction } })
