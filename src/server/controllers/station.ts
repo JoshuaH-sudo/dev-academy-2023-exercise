@@ -4,12 +4,12 @@ import fs from "fs"
 import { csv_station_schema } from "../models/station"
 import Station from "../models/station"
 import Journey from "../models/journey"
-import { csv_data_is_loaded } from "./config"
 import { Station_csv_data, Station_data, Stored_station_data } from "../../common"
 import { Request, Response } from "express"
 
 import debug from "debug"
 import Joi from "joi"
+import Config from "../models/config"
 const debugLog = debug("app:Station_controller:log")
 const errorLog = debug("app:Station_controller:error")
 
@@ -30,8 +30,8 @@ export async function import_stations_csv_to_database() {
     const csv_file_path = path.join(datasets_path, file)
     await read_csv_station_data(csv_file_path)
   }
+  await Config.updateOne({}, { stations_loaded: true })
   debugLog("All station csv files imported to the database")
-  return csv_data_is_loaded()
 }
 
 export function read_csv_station_data(filePath: string): Promise<void> {

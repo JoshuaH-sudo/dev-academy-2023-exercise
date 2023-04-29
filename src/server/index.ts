@@ -16,7 +16,6 @@ import {
 } from "./controllers/journey"
 
 import debug from "debug"
-import { csv_data_is_loaded } from "./controllers/config"
 import {
   clear_stations,
   import_stations_csv_to_database,
@@ -59,17 +58,20 @@ async function start_database() {
   try {
     debugLog("Initializing the database")
     const config = await initialize_config_collection()
-    if (!config.csv_data_is_loaded) {
+    if (!config.journeys_loaded) {
       await clear_journeys()
       import_journey_csv_to_database()
-
+    } else {
+      debugLog("Journeys have already been loaded, continuing")
+    }
+    if (!config.stations_loaded) {
       await clear_stations()
       import_stations_csv_to_database()
-
-      await csv_data_is_loaded()
-      debugLog("Database initialized")
     } else {
-      debugLog("Database has already been initialized, continuing")
+      debugLog("Stations have already been loaded, continuing")
+    }
+    if (config.journeys_loaded && config.stations_loaded) {
+      debugLog("Database initialized")
     }
   } catch (error) {
     errorLog(error)

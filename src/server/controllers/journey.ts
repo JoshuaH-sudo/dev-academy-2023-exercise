@@ -2,14 +2,13 @@ import path from "path"
 import { Journey_csv_data, Journey_data, Stored_journey_data } from "../../common"
 import { parse } from "csv-parse"
 import fs from "fs"
-import { createUnzip } from "zlib"
 import { csv_journey_schema } from "../models/journey"
 import Journey from "../models/journey"
 import { Request, Response } from "express"
 
 import debug from "debug"
 import Joi from "joi"
-import moment from "moment"
+import Config from "../models/config"
 const debugLog = debug("app:journey_controller:log")
 const errorLog = debug("app:journey_controller:error")
 
@@ -37,6 +36,7 @@ export async function import_journey_csv_to_database() {
       const csv_file_path = path.join(journey_datasets_path, file)
       await read_csv_journey_data(csv_file_path)
     }
+    await Config.updateOne({}, { journeys_loaded: true })
     debugLog("All journey csv files imported to the database")
   } catch (error) {
     errorLog("Failed to import csv datasets to database :", error)
