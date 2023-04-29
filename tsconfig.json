@@ -17,6 +17,6 @@
     "outDir": "./dist"
   },
   "compileOnSave": true,
-  "include": ["./src/**/*", "*__tests__*"],
-  "exclude": ["node_modules", "dist", "build", "coverage",]
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "./**/__tests__/**/*"]
 }

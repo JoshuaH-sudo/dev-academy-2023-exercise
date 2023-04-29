@@ -59,7 +59,7 @@
 ## TODO
 * ~~Redownload and Repackage journey csv data~~
 * ~~CI/CD Automate release to public server~~
-* Set config collection to have a boolean check for both csv data types
+* ~~Set config collection to have a boolean check for both csv data types~~
 * Document process of each section.
 * ~~Finalize figma designs~~
 

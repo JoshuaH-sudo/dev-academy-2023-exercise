@@ -28,15 +28,29 @@ export async function clear_journeys() {
 
 //import all the csv files in the datasets folder to the database
 export async function import_journey_csv_to_database() {
+  const journey_config = await get_config()
+
+  if (journey_config.loaded) {
+    debugLog("Journeys have already been loaded, continuing")
+    return
+  }
+
+  await clear_journeys()
+
   try {
+    // Find all the csv files in the datasets folder
     const csv_files = fs.readdirSync(journey_datasets_path)
-    //loop through all the csv files in the datasets folder
+
+    // Loop through all the csv files in the datasets folder
     for (const file of csv_files) {
       debugLog(`Importing ${file} to the database`)
       const csv_file_path = path.join(journey_datasets_path, file)
       await read_csv_journey_data(csv_file_path)
     }
-    await Config.updateOne({}, { journeys_loaded: true })
+
+    journey_config.loaded = true
+    await journey_config.save()
+
     debugLog("All journey csv files imported to the database")
   } catch (error) {
     errorLog("Failed to import csv datasets to database :", error)
@@ -44,11 +58,15 @@ export async function import_journey_csv_to_database() {
   }
 }
 
-export function read_csv_journey_data(filePath: string): Promise<void> {
+export const read_csv_journey_data = async (filePath: string): Promise<void> => {
+  const journey_config = await get_config()
+
   return new Promise((resolve, reject) => {
     //BOM is a byte order mark, which is a special character that is used to indicate the endianness of a file.
     //This is needed to ensure that the parser can read the file correctly.
     const parser = parse({
+      // Start at the line that is saved in the journey config
+      from_line: journey_config.current_line,
       bom: true,
       delimiter: ",",
       columns: true,
@@ -59,13 +77,16 @@ export function read_csv_journey_data(filePath: string): Promise<void> {
     //Feature: Validate data before importing
     parser.on("readable", async () => {
       let record: Journey_csv_data
+      // Tracks the line that is currently being read from the csv file
+      let file_line = journey_config.current_line
+
       while ((record = parser.read()) !== null) {
         //Validating the data from the csv file.
         const journey_csv_data_validation = csv_journey_schema.validate(record)
         if (journey_csv_data_validation.error) {
           //If the data is not valid, skip this record
           errorLog(
-            "Invalid journey data found, skipping it:",
+            "Invalid journey data found, skipping it",
             journey_csv_data_validation.error
           )
           continue
@@ -92,8 +113,15 @@ export function read_csv_journey_data(filePath: string): Promise<void> {
           duration: parseInt(record["Duration (sec.)"]),
         }
 
+        debugLog(
+          `Saving journey data to the database: ${results.departure_station_name}`
+        )
+
         //save the data to the database
         await save_journey_data(results)
+
+        file_line = file_line + 1
+        await update_journey_config(file_line)
       }
     })
 
@@ -102,7 +130,7 @@ export function read_csv_journey_data(filePath: string): Promise<void> {
     })
 
     parser.on("skip", (error) => {
-      errorLog("Skipping line in csv file due to error :", error.message)
+      // errorLog("Skipping line in csv file due to error :", error.message)
     })
 
     parser.on("error", (error: any) => {
@@ -112,6 +140,42 @@ export function read_csv_journey_data(filePath: string): Promise<void> {
     //Read the csv file and pipe it to the parser.
     fs.createReadStream(filePath).pipe(parser)
   })
+}
+
+export const update_journey_config = async (line: number) => {
+  debugLog(`Updating journey config to line ${line}`)
+  try {
+    const config = await get_config()
+
+    config.current_line = line
+
+    await config.save()
+  } catch (error) {
+    errorLog("Failed to update journey config :", error)
+    throw error
+  }
+}
+
+export const get_config = async () => {
+  try {
+    const config = await Config.findOne({ data_type: "journey" })
+
+    if (!config) {
+      debugLog("Creating new journey config")
+      const journey_config = new Config({
+        data_type: "journey",
+        loaded: false,
+        current_line: 1,
+      })
+
+      return await journey_config.save()
+    }
+
+    return config
+  } catch (error) {
+    errorLog("Failed to get config :", error)
+    throw error
+  }
 }
 
 export function save_journey_data(data: Journey_data) {

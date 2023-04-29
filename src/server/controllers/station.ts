@@ -88,7 +88,7 @@ export function read_csv_station_data(filePath: string): Promise<void> {
     })
 
     parser.on("skip", (error) => {
-      errorLog("Skipping line in csv file due to error :", error.message)
+      // errorLog("Skipping line in csv file due to error :", error.message)
     })
 
     parser.on("error", (error: any) => {

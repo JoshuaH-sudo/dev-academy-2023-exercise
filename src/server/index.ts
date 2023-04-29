@@ -57,22 +57,18 @@ async function start_database() {
 
   try {
     debugLog("Initializing the database")
-    const config = await initialize_config_collection()
-    if (!config.journeys_loaded) {
-      await clear_journeys()
-      import_journey_csv_to_database()
-    } else {
-      debugLog("Journeys have already been loaded, continuing")
-    }
-    if (!config.stations_loaded) {
-      await clear_stations()
-      import_stations_csv_to_database()
-    } else {
-      debugLog("Stations have already been loaded, continuing")
-    }
-    if (config.journeys_loaded && config.stations_loaded) {
-      debugLog("Database initialized")
-    }
+    await initialize_config_collection()
+    import_journey_csv_to_database()
+
+    // if (!config.stations_loaded) {
+    await clear_stations()
+    import_stations_csv_to_database()
+    // } else {
+    debugLog("Stations have already been loaded, continuing")
+    // }
+    // if (config.journeys_loaded && config.stations_loaded) {
+    debugLog("Database initialized")
+    // }
   } catch (error) {
     errorLog(error)
   }
