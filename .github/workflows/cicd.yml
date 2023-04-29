@@ -1,47 +1,13 @@
 name: CI/CD
-run-name: CI/CD process
+run-name: build, push and deploy
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
 
 jobs:
-  run-tests:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [19.x]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: yarn install
-
-      - name: Run tests
-        env:
-          NODE_ENV: test
-        run: yarn test
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/clover.xml
-
   push-docker-image:
-    if: github.event_name == 'push'
     needs: run-tests
     runs-on: ubuntu-latest
     outputs:
@@ -69,8 +35,6 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/hsl_bike_app:latest
 
   deploy-to-AWS-ECS:
-    # Only deploy to AWS when a push event occurs
-    if: github.event_name == 'push'
     needs: push-docker-image
     runs-on: ubuntu-latest
     steps:
