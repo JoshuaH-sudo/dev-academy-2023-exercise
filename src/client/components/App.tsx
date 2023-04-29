@@ -20,11 +20,11 @@ const App: FC = () => {
       name: "Journeys",
       content: <Journey_view />,
     },
-    {
-      id: "station-view",
-      name: "Stations",
-      content: <Station_view />,
-    },
+    // {
+    //   id: "station-view",
+    //   name: "Stations",
+    //   content: <Station_view />,
+    // },
   ]
 
   return (
