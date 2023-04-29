@@ -8,7 +8,6 @@ on:
 
 jobs:
   push-docker-image:
-    needs: run-tests
     runs-on: ubuntu-latest
     outputs:
       image-digest: ${{ steps.docker-build-push.outputs.digest }}
