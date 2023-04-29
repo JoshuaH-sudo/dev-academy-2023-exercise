@@ -1,0 +1,37 @@
+# This is used for the AWS ECS deployment.
+version: "3.8"
+services:
+  hsl_bike_app:
+    container_name: hsl_bike_app
+    # Pulls the image from docker hub, does not use the local build image.
+    image: joshuahsudo/hsl_bike_app:latest
+    working_dir: /home/node/app
+    environment:
+      PORT: 8080
+      NODE_ENV: production
+      MONGO_URI: mongodb://app_database:27017
+      # MONGO_URI_FILE: /run/secrets/db_mongo_uri
+    ports:
+      - "8080:8080"
+    depends_on:
+      - app_database
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 16Gb
+
+  # This does not use credentials which is not ideal but I am currently unable to get it to work with credentials in the cloudformation template.
+  app_database:
+    container_name: app_database
+    image: mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 16Gb
+volumes:
+  mongo-data:

@@ -57,7 +57,7 @@
 * Create UI for adding journeys or bicycle stations
 
 ## TODO
-* Redownload and Repackage journey csv data
+* ~~Redownload and Repackage journey csv data~~
 * Add credentials to the database
 * CI/CD Automate release to public server
 * Set config collection to have a boolean check for both csv data types
@@ -65,3 +65,5 @@
 
 ## Bugs
 * App does not wait until all items are added to the database before setting csv_data_is_loaded to true
+* Station stats take to long to get. split up request data.
+* Switching page in table before loading completes causes it to continually switch between the two pages

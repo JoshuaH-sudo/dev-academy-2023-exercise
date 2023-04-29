@@ -1,6 +1,0 @@
-FROM node:gallium-bullseye-slim
-WORKDIR /home/node/app
-COPY ../package*.json ./
-RUN yarn install
-COPY ../ ./
-EXPOSE 8080

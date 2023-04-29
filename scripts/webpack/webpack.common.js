@@ -4,14 +4,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
   entry: "./src/client/index.tsx",
-  mode: "development",
-  devtool: "inline-source-map",
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         use: "ts-loader",
-        exclude: /node_modules/,
+        exclude: [/node_modules/, /__test__/, /__mocks__/, /.jest./],
       },
       {
         test: /\.css$/,
@@ -27,7 +25,6 @@ module.exports = {
         test: /\.png$/,
         loader: "file-loader",
         options: {
-          outputPath: "../",
           name: "[name].[ext]",
         },
       },
@@ -37,14 +34,13 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "../../public", "dist"),
+    path: path.resolve(__dirname, "../../public"),
   },
   plugins: [
     //Will automatically attach the bundle to the index.html
     new HtmlWebpackPlugin({
       title: "Helsinki City Bike",
-      outputPath: "../",
+      publicPath: "/files",
       filename: "index.html",
       template: "./src/client/assets/index.html",
     }),

@@ -14,7 +14,6 @@ const debugLog = debug("app:Station_controller:log")
 const errorLog = debug("app:Station_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets", "stations")
-export const csv_files = fs.readdirSync(datasets_path)
 
 //Clear all Stations from the database
 export async function clear_stations() {
@@ -24,6 +23,7 @@ export async function clear_stations() {
 
 //import all the csv files in the datasets folder to the database
 export async function import_stations_csv_to_database() {
+  const csv_files = fs.readdirSync(datasets_path)
   //loop through all the csv files in the datasets folder
   for (const file of csv_files) {
     debugLog(`Importing ${file} to the database`)

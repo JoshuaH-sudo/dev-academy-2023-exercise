@@ -35,6 +35,7 @@ const App: FC = () => {
             <EuiTabbedContent
               tabs={tabs}
               initialSelectedTab={tabs[0]}
+              //@ts-ignore This is correct from the documentation
               autoFocus="selected"
             />
           </EuiPageSection>

@@ -1,0 +1,16 @@
+FROM node:gallium-bullseye-slim
+WORKDIR /home/node/app
+
+# Copy all files from the root directory
+COPY . .
+RUN yarn install
+# Need this to decompress the dataset tar files
+# Do not want to decompress them and apply it to the final image
+RUN apt-get update
+RUN apt-get install bzip2
+
+RUN yarn dev_build
+
+EXPOSE 8080
+
+CMD ["yarn", "start"]

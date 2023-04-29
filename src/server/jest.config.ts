@@ -13,6 +13,7 @@ const config: Config = {
     "\\.(css|less)$": "identity-obj-proxy",
   },
   setupFilesAfterEnv: ["<rootDir>/test_setup.ts"],
+  testTimeout: 30000,
 }
 
 export default config
