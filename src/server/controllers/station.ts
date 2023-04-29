@@ -1,7 +1,7 @@
 import path from "path"
 import { parse } from "csv-parse"
 import fs from "fs"
-import { csv_station_schema } from "../models/station"
+import station, { csv_station_schema } from "../models/station"
 import Station from "../models/station"
 import Journey from "../models/journey"
 import { Station_csv_data, Station_data, Stored_station_data } from "../../common"
@@ -23,6 +23,13 @@ export async function clear_stations() {
 
 //import all the csv files in the datasets folder to the database
 export async function import_stations_csv_to_database() {
+  const station_config = await get_config()
+
+  if (station_config.loaded) {
+    debugLog("Stations have already been loaded, continuing")
+    return
+  }
+
   const csv_files = fs.readdirSync(datasets_path)
   //loop through all the csv files in the datasets folder
   for (const file of csv_files) {
@@ -30,15 +37,21 @@ export async function import_stations_csv_to_database() {
     const csv_file_path = path.join(datasets_path, file)
     await read_csv_station_data(csv_file_path)
   }
-  await Config.updateOne({}, { stations_loaded: true })
+
+  station_config.loaded = true
+  await station_config.save()
+
   debugLog("All station csv files imported to the database")
 }
 
-export function read_csv_station_data(filePath: string): Promise<void> {
+export const read_csv_station_data = async (filePath: string): Promise<void> => {
+  const station_config = await get_config()
+
   return new Promise((resolve, reject) => {
     //BOM is a byte order mark, which is a special character that is used to indicate the endianness of a file.
     //This is needed to ensure that the parser can read the file correctly.
     const parser = parse({
+      from_line: station_config.current_line,
       bom: true,
       delimiter: ",",
       columns: true,
@@ -49,6 +62,8 @@ export function read_csv_station_data(filePath: string): Promise<void> {
     //Feature: Validate data before importing
     parser.on("readable", async () => {
       let record: Station_csv_data
+      let file_line = station_config.current_line
+
       while ((record = parser.read()) !== null) {
         //Validating the data from the csv file.
         const Station_csv_data_validation = csv_station_schema.validate(record)
@@ -80,6 +95,9 @@ export function read_csv_station_data(filePath: string): Promise<void> {
 
         //save the data to the database
         await save_station_data(results)
+
+        file_line = file_line + 1
+        await update_station_config(file_line)
       }
     })
 
@@ -92,7 +110,7 @@ export function read_csv_station_data(filePath: string): Promise<void> {
     })
 
     parser.on("error", (error: any) => {
-      errorLog("Parsing error :", error)
+      reject(error)
     })
 
     //Read the csv file and pipe it to the parser.
@@ -100,6 +118,41 @@ export function read_csv_station_data(filePath: string): Promise<void> {
   })
 }
 
+export const update_station_config = async (line: number) => {
+  debugLog(`Updating station config to line ${line}`)
+  try {
+    const config = await get_config()
+
+    config.current_line = line
+
+    await config.save()
+  } catch (error) {
+    errorLog("Failed to update station config :", error)
+    throw error
+  }
+}
+
+export const get_config = async () => {
+  try {
+    const config = await Config.findOne({ data_type: "station" })
+
+    if (!config) {
+      debugLog("Creating new journey config")
+      const journey_config = new Config({
+        data_type: "station",
+        loaded: false,
+        current_line: 1,
+      })
+
+      return await journey_config.save()
+    }
+
+    return config
+  } catch (error) {
+    errorLog("Failed to get station config :", error)
+    throw error
+  }
+}
 export function save_station_data(data: Station_data) {
   const new_station = new Station(data)
   return new_station.save()

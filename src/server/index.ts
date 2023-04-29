@@ -10,19 +10,13 @@ import app_router from "./routes/app"
 import journey_router from "./routes/journey"
 import station_router from "./routes/station"
 import { initialize_config_collection } from "./models/config"
-import {
-  clear_journeys,
-  import_journey_csv_to_database,
-} from "./controllers/journey"
+import { import_journey_csv_to_database } from "./controllers/journey"
+import { import_stations_csv_to_database } from "./controllers/station"
 
-import debug from "debug"
-import {
-  clear_stations,
-  import_stations_csv_to_database,
-} from "./controllers/station"
 const { config } = require("dotenv")
 config()
 
+import debug from "debug"
 const debugLog = debug("app:server:log")
 const errorLog = debug("app:server:error")
 
@@ -33,10 +27,10 @@ app.use(logger("dev"))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(express.static(path.join(__dirname, "../../", "public")))
+app.use(express.static(path.join(__dirname, "..", "..", "public")))
 app.use(
   "/files",
-  expressStaticGzip(path.join(__dirname, "../../", "public"), {
+  expressStaticGzip(path.join(__dirname, "..", "..", "public"), {
     enableBrotli: true,
   })
 )
@@ -57,18 +51,17 @@ async function start_database() {
 
   try {
     debugLog("Initializing the database")
-    await initialize_config_collection()
-    import_journey_csv_to_database()
 
-    // if (!config.stations_loaded) {
-    await clear_stations()
-    import_stations_csv_to_database()
-    // } else {
-    debugLog("Stations have already been loaded, continuing")
-    // }
-    // if (config.journeys_loaded && config.stations_loaded) {
-    debugLog("Database initialized")
-    // }
+    await initialize_config_collection()
+
+    const journey_import = import_journey_csv_to_database()
+    const station_import = import_stations_csv_to_database()
+
+    // Don't want to hold up the server from starting while the csv files are being imported
+    Promise.all([journey_import, station_import]).then(() => {
+      debugLog("Database initialization complete")
+    })
+
   } catch (error) {
     errorLog(error)
   }

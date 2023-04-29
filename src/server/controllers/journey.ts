@@ -173,7 +173,7 @@ export const get_config = async () => {
 
     return config
   } catch (error) {
-    errorLog("Failed to get config :", error)
+    errorLog("Failed to get journey config :", error)
     throw error
   }
 }
