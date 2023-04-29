@@ -1,16 +1,17 @@
 #This compose file is for producing the production image
-version: "3"
+version: "3.8"
 services:
   hsl_bike_app:
+    container_name: hsl_bike_app
     build:
       context: ../
       dockerfile: ./docker/dockerfile.prod.yml
     working_dir: /home/node/app
     # Set the MONGO URI to a file so that it can be read from the secrets manager.
     environment:
-      - PORT=8080
-      - NODE_ENV=production
-      - MONGO_URI_FILE=/run/secrets/db_mongo_uri
+      PORT: 8080
+      NODE_ENV: production
+      MONGO_URI_FILE: /run/secrets/db_mongo_uri
     ports:
       - "8080:8080"
     secrets:
@@ -19,11 +20,13 @@ services:
       - app_database
 
   app_database:
+    container_name: app_database
     image: mongo
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/db_username
-      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/db_password
+      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
+      MONGO_INITDB_DATABASE: hsl_bike_app
     ports:
       - "27017:27017"
     secrets:

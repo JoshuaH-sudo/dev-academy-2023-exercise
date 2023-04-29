@@ -1,25 +1,44 @@
-version: "3"
+version: "3.8"
 services:
   hsl_bike_app:
-    build: 
+    container_name: hsl_bike_app
+    build:
       context: ../
       dockerfile: ./docker/dockerfile.dev.yml
     working_dir: /home/node/app
     ports:
       - "8080:8080"
     environment:
-      - PORT=8080
-      - NODE_ENV=development
-      - MONGO_URI=mongodb://app_database:27017/dev-academy
+      PORT: 8080
+      NODE_ENV: development
+      MONGO_URI_FILE: /run/secrets/db_mongo_uri
+    secrets:
+      - db_mongo_uri
     depends_on:
       - app_database
 
   app_database:
+    container_name: app_database
     image: mongo
     restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
+      MONGO_INITDB_DATABASE: hsl_bike_app
+    secrets:
+      - db_username
+      - db_password
     ports:
       - "27017:27017"
     volumes:
+      - ../scripts/mongo/create_user.js:/docker-entrypoint-initdb.d/create_user.js:ro
       - mongo-data:/data/db
+secrets:
+  db_username:
+    file: ../environment/db_root_username.env
+  db_password:
+    file: ../environment/db_root_password.env
+  db_mongo_uri:
+    file: ../environment/db_mongo_uri.env
 volumes:
   mongo-data:

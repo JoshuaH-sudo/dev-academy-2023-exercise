@@ -1,29 +1,16 @@
 AWSTemplateFormatVersion: 2010-09-09
-Parameters:
-  # Parameter for database username
-  DBUsername:
-    Type: String
-    Default: test
-  # Parameter for database password
-  DBPassword:
-    Type: String
-    Default: test
-  DBMongoUri:
-    Type: String
-    # Default: mongodb://test:test@app_database:27017/hsl_bike_app
-    Default: mongodb://app_database:27017/
 Resources:
   AppdatabaseService:
     DependsOn:
-      - AppdatabaseTCP27017Listener
-      - MongodataNFSMountTargetOnSubnet05b198577868ae8e3
-      - MongodataNFSMountTargetOnSubnet0d00ccf5f1b79ba4a
-      - MongodataNFSMountTargetOnSubnet09df8bdf6bc065650
+    - AppdatabaseTCP27017Listener
+    - MongodataNFSMountTargetOnSubnet05b198577868ae8e3
+    - MongodataNFSMountTargetOnSubnet0d00ccf5f1b79ba4a
+    - MongodataNFSMountTargetOnSubnet09df8bdf6bc065650
     Properties:
       Cluster:
         Fn::GetAtt:
-          - Cluster
-          - Arn
+        - Cluster
+        - Arn
       DeploymentConfiguration:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
@@ -32,32 +19,32 @@ Resources:
       DesiredCount: 1
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: app_database
-          ContainerPort: 27017
-          TargetGroupArn:
-            Ref: AppdatabaseTCP27017TargetGroup
+      - ContainerName: app_database
+        ContainerPort: 27017
+        TargetGroupArn:
+          Ref: AppdatabaseTCP27017TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - Ref: DefaultNetwork
+          - Ref: DefaultNetwork
           Subnets:
-            - subnet-05b198577868ae8e3
-            - subnet-0d00ccf5f1b79ba4a
-            - subnet-09df8bdf6bc065650
+          - subnet-05b198577868ae8e3
+          - subnet-0d00ccf5f1b79ba4a
+          - subnet-09df8bdf6bc065650
       PlatformVersion: 1.4.0
       PropagateTags: SERVICE
       SchedulingStrategy: REPLICA
       ServiceRegistries:
-        - RegistryArn:
-            Fn::GetAtt:
-              - AppdatabaseServiceDiscoveryEntry
-              - Arn
+      - RegistryArn:
+          Fn::GetAtt:
+          - AppdatabaseServiceDiscoveryEntry
+          - Arn
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.service
-          Value: app_database
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.service
+        Value: app_database
       TaskDefinition:
         Ref: AppdatabaseTaskDefinition
     Type: AWS::ECS::Service
@@ -66,8 +53,8 @@ Resources:
       Description: '"app_database" service discovery entry in Cloud Map'
       DnsConfig:
         DnsRecords:
-          - TTL: 60
-            Type: A
+        - TTL: 60
+          Type: A
         RoutingPolicy: MULTIVALUE
       HealthCheckCustomConfig:
         FailureThreshold: 1
@@ -78,11 +65,11 @@ Resources:
   AppdatabaseTCP27017Listener:
     Properties:
       DefaultActions:
-        - ForwardConfig:
-            TargetGroups:
-              - TargetGroupArn:
-                  Ref: AppdatabaseTCP27017TargetGroup
-          Type: forward
+      - ForwardConfig:
+          TargetGroups:
+          - TargetGroupArn:
+              Ref: AppdatabaseTCP27017TargetGroup
+        Type: forward
       LoadBalancerArn:
         Ref: LoadBalancer
       Port: 27017
@@ -93,59 +80,83 @@ Resources:
       Port: 27017
       Protocol: TCP
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
       TargetType: ip
       VpcId: vpc-0184ca5a98b218c37
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
   AppdatabaseTaskDefinition:
     Properties:
       ContainerDefinitions:
-        - Command:
-            - ap-southeast-2.compute.internal
-            - hsl-bike-app.local
-          Essential: false
-          Image: docker/ecs-searchdomain-sidecar:1.0
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroup
-              awslogs-region:
-                Ref: AWS::Region
-              awslogs-stream-prefix: hsl-bike-app
-          Name: Appdatabase_ResolvConf_InitContainer
-        - DependsOn:
-            - Condition: SUCCESS
-              ContainerName: Appdatabase_ResolvConf_InitContainer
-          Environment:
-            - Name: MONGO_INITDB_DATABASE
-              Value: hsl_bike_app
-            # - Name: MONGO_INITDB_ROOT_PASSWORD
-            #   Value:
-            #     Ref: DBPassword
-            # - Name: MONGO_INITDB_ROOT_USERNAME
-            #   Value:
-            #     Ref: DBUsername
-          Essential: true
-          Image: docker.io/library/mongo:latest@sha256:9c8a0a019671ed7d402768d4df6dddcc898828e21e9f7b90a34b55fe8ca676ac
-          LinuxParameters: {}
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroup
-              awslogs-region:
-                Ref: AWS::Region
-              awslogs-stream-prefix: hsl-bike-app
-          MountPoints:
-            - ContainerPath: /data/db
-              SourceVolume: mongo-data
-          Name: app_database
-          PortMappings:
-            - ContainerPort: 27017
-              HostPort: 27017
-              Protocol: tcp
+      - Command:
+        - '[{"Name":"db_username","Keys":null},{"Name":"db_password","Keys":null}]'
+        Essential: false
+        Image: docker/ecs-secrets-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: hsl-bike-app
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          SourceVolume: secrets
+        Name: Appdatabase_Secrets_InitContainer
+        Secrets:
+        - Name: db_username
+          ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG
+        - Name: db_password
+          ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE
+      - Command:
+        - ap-southeast-2.compute.internal
+        - hsl-bike-app.local
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: hsl-bike-app
+        Name: Appdatabase_ResolvConf_InitContainer
+      - DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Appdatabase_Secrets_InitContainer
+        - Condition: SUCCESS
+          ContainerName: Appdatabase_ResolvConf_InitContainer
+        Environment:
+        - Name: MONGO_INITDB_DATABASE
+          Value: hsl_bike_app
+        - Name: MONGO_INITDB_ROOT_PASSWORD_FILE
+          Value: /run/secrets/db_password
+        - Name: MONGO_INITDB_ROOT_USERNAME_FILE
+          Value: /run/secrets/db_username
+        Essential: true
+        Image: docker.io/library/mongo:latest@sha256:9c8a0a019671ed7d402768d4df6dddcc898828e21e9f7b90a34b55fe8ca676ac
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: hsl-bike-app
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          ReadOnly: true
+          SourceVolume: secrets
+        - ContainerPath: /data/db
+          SourceVolume: mongo-data
+        Name: app_database
+        PortMappings:
+        - ContainerPort: 27017
+          HostPort: 27017
+          Protocol: tcp
       Cpu: "2048"
       ExecutionRoleArn:
         Ref: AppdatabaseTaskExecutionRole
@@ -153,72 +164,87 @@ Resources:
       Memory: "16384"
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - FARGATE
+      - FARGATE
       TaskRoleArn:
         Ref: AppdatabaseTaskRole
       Volumes:
-        - EFSVolumeConfiguration:
-            AuthorizationConfig:
-              AccessPointId:
-                Ref: MongodataAccessPoint
-              IAM: ENABLED
-            FilesystemId: fs-06ad7853c85e5b5d3
-            TransitEncryption: ENABLED
-          Name: mongo-data
+      - Name: secrets
+      - EFSVolumeConfiguration:
+          AuthorizationConfig:
+            AccessPointId:
+              Ref: MongodataAccessPoint
+            IAM: ENABLED
+          FilesystemId: fs-06ad7853c85e5b5d3
+          TransitEncryption: ENABLED
+        Name: mongo-data
     Type: AWS::ECS::TaskDefinition
   AppdatabaseTaskExecutionRole:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Action:
-              - sts:AssumeRole
-            Condition: {}
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
         Version: 2012-10-17
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - secretsmanager:GetSecretValue
+            - ssm:GetParameters
+            - kms:Decrypt
+            Condition: {}
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-username-pVYYRG
+            - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-db-password-RtF4cE
+        PolicyName: app_databaseGrantAccessToSecrets
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.service
-          Value: app_database
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.service
+        Value: app_database
     Type: AWS::IAM::Role
   AppdatabaseTaskRole:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Action:
-              - sts:AssumeRole
-            Condition: {}
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
         Version: 2012-10-17
       Policies:
-        - PolicyDocument:
-            Statement:
-              - Action:
-                  - elasticfilesystem:ClientMount
-                  - elasticfilesystem:ClientWrite
-                  - elasticfilesystem:ClientRootAccess
-                Condition:
-                  StringEquals:
-                    elasticfilesystem:AccessPointArn:
-                      Ref: MongodataAccessPoint
-                Effect: Allow
-                Principal: {}
-                Resource:
-                  - arn:aws:elasticfilesystem:ap-southeast-2:788286108805:file-system/fs-06ad7853c85e5b5d3
-            Version: 2012-10-17
-          PolicyName: AppdatabaseMongodataVolumeMountPolicy
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - elasticfilesystem:ClientMount
+            - elasticfilesystem:ClientWrite
+            - elasticfilesystem:ClientRootAccess
+            Condition:
+              StringEquals:
+                elasticfilesystem:AccessPointArn:
+                  Ref: MongodataAccessPoint
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - arn:aws:elasticfilesystem:ap-southeast-2:788286108805:file-system/fs-06ad7853c85e5b5d3
+          Version: 2012-10-17
+        PolicyName: AppdatabaseMongodataVolumeMountPolicy
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.service
-          Value: app_database
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.service
+        Value: app_database
     Type: AWS::IAM::Role
   CloudMap:
     Properties:
@@ -230,8 +256,8 @@ Resources:
     Properties:
       ClusterName: hsl-bike-app
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
     Type: AWS::ECS::Cluster
   Default8080Ingress:
     Properties:
@@ -257,10 +283,10 @@ Resources:
     Properties:
       GroupDescription: hsl-bike-app Security Group for default network
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.network
-          Value: hsl-bike-app_default
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.network
+        Value: hsl-bike-app_default
       VpcId: vpc-0184ca5a98b218c37
     Type: AWS::EC2::SecurityGroup
   DefaultNetworkIngress:
@@ -274,13 +300,13 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   HslbikeappService:
     DependsOn:
-      - HslbikeappTCP8080Listener
-      - AppdatabaseService
+    - HslbikeappTCP8080Listener
+    - AppdatabaseService
     Properties:
       Cluster:
         Fn::GetAtt:
-          - Cluster
-          - Arn
+        - Cluster
+        - Arn
       DeploymentConfiguration:
         MaximumPercent: 200
         MinimumHealthyPercent: 100
@@ -289,32 +315,32 @@ Resources:
       DesiredCount: 1
       LaunchType: FARGATE
       LoadBalancers:
-        - ContainerName: hsl_bike_app
-          ContainerPort: 8080
-          TargetGroupArn:
-            Ref: HslbikeappTCP8080TargetGroup
+      - ContainerName: hsl_bike_app
+        ContainerPort: 8080
+        TargetGroupArn:
+          Ref: HslbikeappTCP8080TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - Ref: DefaultNetwork
+          - Ref: DefaultNetwork
           Subnets:
-            - subnet-05b198577868ae8e3
-            - subnet-0d00ccf5f1b79ba4a
-            - subnet-09df8bdf6bc065650
+          - subnet-05b198577868ae8e3
+          - subnet-0d00ccf5f1b79ba4a
+          - subnet-09df8bdf6bc065650
       PlatformVersion: 1.4.0
       PropagateTags: SERVICE
       SchedulingStrategy: REPLICA
       ServiceRegistries:
-        - RegistryArn:
-            Fn::GetAtt:
-              - HslbikeappServiceDiscoveryEntry
-              - Arn
+      - RegistryArn:
+          Fn::GetAtt:
+          - HslbikeappServiceDiscoveryEntry
+          - Arn
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.service
-          Value: hsl_bike_app
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.service
+        Value: hsl_bike_app
       TaskDefinition:
         Ref: HslbikeappTaskDefinition
     Type: AWS::ECS::Service
@@ -323,8 +349,8 @@ Resources:
       Description: '"hsl_bike_app" service discovery entry in Cloud Map'
       DnsConfig:
         DnsRecords:
-          - TTL: 60
-            Type: A
+        - TTL: 60
+          Type: A
         RoutingPolicy: MULTIVALUE
       HealthCheckCustomConfig:
         FailureThreshold: 1
@@ -335,11 +361,11 @@ Resources:
   HslbikeappTCP8080Listener:
     Properties:
       DefaultActions:
-        - ForwardConfig:
-            TargetGroups:
-              - TargetGroupArn:
-                  Ref: HslbikeappTCP8080TargetGroup
-          Type: forward
+      - ForwardConfig:
+          TargetGroups:
+          - TargetGroupArn:
+              Ref: HslbikeappTCP8080TargetGroup
+        Type: forward
       LoadBalancerArn:
         Ref: LoadBalancer
       Port: 8080
@@ -350,56 +376,80 @@ Resources:
       Port: 8080
       Protocol: TCP
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
       TargetType: ip
       VpcId: vpc-0184ca5a98b218c37
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
   HslbikeappTaskDefinition:
     Properties:
       ContainerDefinitions:
-        - Command:
-            - ap-southeast-2.compute.internal
-            - hsl-bike-app.local
-          Essential: false
-          Image: docker/ecs-searchdomain-sidecar:1.0
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroup
-              awslogs-region:
-                Ref: AWS::Region
-              awslogs-stream-prefix: hsl-bike-app
-          Name: Hslbikeapp_ResolvConf_InitContainer
-        - DependsOn:
-            - Condition: SUCCESS
-              ContainerName: Hslbikeapp_ResolvConf_InitContainer
-          Environment:
-            - Name: MONGO_URI
-              Value:
-                Ref: DBMongoUri
-            - Name: NODE_ENV
-              Value: production
-            - Name: PORT
-              Value: "8080"
-          Essential: true
-          Image: docker.io/joshuahsudo/hsl_bike_app:latest@sha256:6e03a4aa6817db8ee7e10ab4f9f4c325f077e6e61b07d3e57c3ce934af9d9615
-          LinuxParameters: {}
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: LogGroup
-              awslogs-region:
-                Ref: AWS::Region
-              awslogs-stream-prefix: hsl-bike-app
-          Name: hsl_bike_app
-          PortMappings:
-            - ContainerPort: 8080
-              HostPort: 8080
-              Protocol: tcp
-          WorkingDirectory: /home/node/app
+      - Command:
+        - '[{"Name":"db_mongo_uri","Keys":null}]'
+        Essential: false
+        Image: docker/ecs-secrets-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: hsl-bike-app
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          SourceVolume: secrets
+        Name: Hslbikeapp_Secrets_InitContainer
+        Secrets:
+        - Name: db_mongo_uri
+          ValueFrom: arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
+      - Command:
+        - ap-southeast-2.compute.internal
+        - hsl-bike-app.local
+        Essential: false
+        Image: docker/ecs-searchdomain-sidecar:1.0
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: hsl-bike-app
+        Name: Hslbikeapp_ResolvConf_InitContainer
+      - DependsOn:
+        - Condition: SUCCESS
+          ContainerName: Hslbikeapp_Secrets_InitContainer
+        - Condition: SUCCESS
+          ContainerName: Hslbikeapp_ResolvConf_InitContainer
+        Environment:
+        - Name: MONGO_URI_FILE
+          Value: /run/secrets/db_mongo_uri
+        - Name: NODE_ENV
+          Value: production
+        - Name: PORT
+          Value: "8080"
+        Essential: true
+        Image: docker.io/joshuahsudo/hsl_bike_app:latest@sha256:6e03a4aa6817db8ee7e10ab4f9f4c325f077e6e61b07d3e57c3ce934af9d9615
+        LinuxParameters: {}
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: LogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: hsl-bike-app
+        MountPoints:
+        - ContainerPath: /run/secrets/
+          ReadOnly: true
+          SourceVolume: secrets
+        Name: hsl_bike_app
+        PortMappings:
+        - ContainerPort: 8080
+          HostPort: 8080
+          Protocol: tcp
+        WorkingDirectory: /home/node/app
       Cpu: "2048"
       ExecutionRoleArn:
         Ref: HslbikeappTaskExecutionRole
@@ -407,41 +457,56 @@ Resources:
       Memory: "16384"
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - FARGATE
+      - FARGATE
+      Volumes:
+      - Name: secrets
     Type: AWS::ECS::TaskDefinition
   HslbikeappTaskExecutionRole:
     Properties:
       AssumeRolePolicyDocument:
         Statement:
-          - Action:
-              - sts:AssumeRole
-            Condition: {}
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
+        - Action:
+          - sts:AssumeRole
+          Condition: {}
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
         Version: 2012-10-17
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - secretsmanager:GetSecretValue
+            - ssm:GetParameters
+            - kms:Decrypt
+            Condition: {}
+            Effect: Allow
+            Principal: {}
+            Resource:
+            - arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5
+        PolicyName: hsl_bike_appGrantAccessToSecrets
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.service
-          Value: hsl_bike_app
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.service
+        Value: hsl_bike_app
     Type: AWS::IAM::Role
   LoadBalancer:
     Properties:
       LoadBalancerAttributes:
-        - Key: load_balancing.cross_zone.enabled
-          Value: "true"
+      - Key: load_balancing.cross_zone.enabled
+        Value: "true"
       Scheme: internet-facing
       Subnets:
-        - subnet-05b198577868ae8e3
-        - subnet-0d00ccf5f1b79ba4a
-        - subnet-09df8bdf6bc065650
+      - subnet-05b198577868ae8e3
+      - subnet-0d00ccf5f1b79ba4a
+      - subnet-09df8bdf6bc065650
       Tags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
       Type: network
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
   LogGroup:
@@ -451,32 +516,32 @@ Resources:
   MongodataAccessPoint:
     Properties:
       AccessPointTags:
-        - Key: com.docker.compose.project
-          Value: hsl-bike-app
-        - Key: com.docker.compose.volume
-          Value: mongo-data
-        - Key: Name
-          Value: hsl-bike-app_mongo-data
+      - Key: com.docker.compose.project
+        Value: hsl-bike-app
+      - Key: com.docker.compose.volume
+        Value: mongo-data
+      - Key: Name
+        Value: hsl-bike-app_mongo-data
       FileSystemId: fs-06ad7853c85e5b5d3
     Type: AWS::EFS::AccessPoint
   MongodataNFSMountTargetOnSubnet05b198577868ae8e3:
     Properties:
       FileSystemId: fs-06ad7853c85e5b5d3
       SecurityGroups:
-        - Ref: DefaultNetwork
+      - Ref: DefaultNetwork
       SubnetId: subnet-05b198577868ae8e3
     Type: AWS::EFS::MountTarget
   MongodataNFSMountTargetOnSubnet09df8bdf6bc065650:
     Properties:
       FileSystemId: fs-06ad7853c85e5b5d3
       SecurityGroups:
-        - Ref: DefaultNetwork
+      - Ref: DefaultNetwork
       SubnetId: subnet-09df8bdf6bc065650
     Type: AWS::EFS::MountTarget
   MongodataNFSMountTargetOnSubnet0d00ccf5f1b79ba4a:
     Properties:
       FileSystemId: fs-06ad7853c85e5b5d3
       SecurityGroups:
-        - Ref: DefaultNetwork
+      - Ref: DefaultNetwork
       SubnetId: subnet-0d00ccf5f1b79ba4a
     Type: AWS::EFS::MountTarget
