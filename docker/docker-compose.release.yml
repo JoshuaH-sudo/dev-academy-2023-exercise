@@ -9,21 +9,29 @@ services:
     environment:
       PORT: 8080
       NODE_ENV: production
-      MONGO_URI_FILE: /run/secrets/db_mongo_uri
+      MONGO_URI: mongodb://app_database:27017
+      # MONGO_URI_FILE: /run/secrets/db_mongo_uri
     ports:
       - "8080:8080"
-    secrets:
-      - db_mongo_uri
+    depends_on:
+      - app_database
     deploy:
       resources:
         limits:
           cpus: '2'
           memory: 16Gb
 
-secrets:
-  # Setting the secrets to external means that the secrets are not stored in the docker-compose file and cloud formation.
-  db_mongo_uri:
-    name: "arn:aws:secretsmanager:ap-southeast-2:788286108805:secret:hsl-bike-app-mongo-uri-4h0gb5"
-    external: true
+  # This does not use credentials which is not ideal but I am currently unable to get it to work with credentials in the cloudformation template.
+  app_database:
+    container_name: app_database
+    image: mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 16Gb
 volumes:
   mongo-data:
