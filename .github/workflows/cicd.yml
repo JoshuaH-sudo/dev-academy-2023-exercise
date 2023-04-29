@@ -54,12 +54,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
+        id: docker_build_push
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./docker/dockerfile.prod.yml
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/hsl_bike_app:latest
+          
 
   deploy-to-AWS-ECS:
     needs: push-docker-image
@@ -80,3 +82,4 @@ jobs:
         with:
           name: hsl-bike-app
           template: ./aws/cloud_template.yml
+          parameter-overrides: "HslbikeappImage=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/hsl_bike_app:latest@${{ docker_build_push.outputs.digest }}"

@@ -1,4 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  # HslbikeappImage: docker.io/joshuahsudo/hsl_bike_app:latest@{{ docker digest }}
+  HslbikeappImage:
+    Type: String
 Resources:
   AppdatabaseService:
     DependsOn:
@@ -318,7 +322,8 @@ Resources:
         - Name: PORT
           Value: "8080"
         Essential: true
-        Image: docker.io/joshuahsudo/hsl_bike_app:latest@sha256:19512bb82f30e40a2e4ae4b119687aa626a4e715736c87b0cedd4d716a380d24
+        Image: 
+          Ref: HslbikeappImage
         LinuxParameters: {}
         LogConfiguration:
           LogDriver: awslogs
