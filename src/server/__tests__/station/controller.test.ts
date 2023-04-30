@@ -14,66 +14,72 @@ const bad_stations_csv_file = path.join(mock_datasets_path, "bad_stations.csv")
 
 //These test focus on the Station Collection, such as adding and removing documents
 describe("Station Collection", () => {
-  it("Should save station data", async () => {
-    //store station data without _id
-    const station = { ...dummy_station_A, _id: undefined }
-    await save_station_data(station)
+  describe("Station CRUD", () => {
+    it("Should save station data", async () => {
+      //store station data without _id
+      const station = { ...dummy_station_A, _id: undefined }
+      await save_station_data(station)
 
-    const saved_station = await Station.findOne({
-      _id: station._id,
+      const saved_station = await Station.findOne({
+        _id: station._id,
+      })
+
+      expect(saved_station).toBeDefined()
     })
 
-    expect(saved_station).toBeDefined()
-  })
+    it("Should delete all station data", async () => {
+      await clear_stations()
 
-  it("Should delete all station data", async () => {
-    await clear_stations()
+      const new_document_count = await Station.countDocuments()
 
-    const new_document_count = await Station.countDocuments()
-
-    expect(new_document_count).toBe(0)
-  })
-
-  it("Should parse valid station data from csv file", async () => {
-    await create_file_tracker(good_stations_csv_file)
-    await read_csv_station_data(good_stations_csv_file)
-
-    const stored_station = await Station.findOne({
-      nimi: dummy_station_A.nimi,
+      expect(new_document_count).toBe(0)
     })
 
-    expect(stored_station).toBeDefined()
-  })
+    it("Should parse valid station data from csv file", async () => {
+      await create_file_tracker(good_stations_csv_file)
+      await read_csv_station_data(good_stations_csv_file)
 
-  it("Should not store station data with duration of less than 10 seconds", async () => {
-    //Find a station with a duration less than 10 seconds
-    const stored_station = await Station.findOne({
-      duration: { $lt: 10 },
+      const stored_station = await Station.findOne({
+        nimi: dummy_station_A.nimi,
+      })
+
+      expect(stored_station).toBeDefined()
     })
 
-    expect(stored_station).toBeNull()
+    it("Should not store station data with duration of less than 10 seconds", async () => {
+      await create_file_tracker(good_stations_csv_file)
+      await read_csv_station_data(good_stations_csv_file)
+      //Find a station with a duration less than 10 seconds
+      const stored_station = await Station.findOne({
+        duration: { $lt: 10 },
+      })
+
+      expect(stored_station).toBeNull()
+    })
   })
 
-  it("Should not store station data with cover distance of less than 10 meters", async () => {
-    //Find a station with a duration less than 10 seconds
-    const stored_station = await Station.findOne({
-      covered_distance: { $lt: 10 },
+  describe("Station CSV Import", () => {
+    it("Should not store station data with cover distance of less than 10 meters", async () => {
+      await create_file_tracker(good_stations_csv_file)
+      await read_csv_station_data(good_stations_csv_file)
+      //Find a station with a duration less than 10 seconds
+      const stored_station = await Station.findOne({
+        covered_distance: { $lt: 10 },
+      })
+
+      expect(stored_station).toBeNull()
     })
 
-    expect(stored_station).toBeNull()
-  })
+    it("Should not parse invalid station data from csv file", async () => {
+      const document_count = await Station.countDocuments()
+      expect(document_count).toBe(0)
 
-  it("Should not parse invalid station data from csv file", async () => {
-    //clear database for test
-    await clear_stations()
-    const document_count = await Station.countDocuments()
-    expect(document_count).toBe(0)
+      await create_file_tracker(bad_stations_csv_file)
+      //No valid station data is stored within this csv file
+      await read_csv_station_data(bad_stations_csv_file)
 
-    await create_file_tracker(bad_stations_csv_file)
-    //No valid station data is stored within this csv file
-    await read_csv_station_data(bad_stations_csv_file)
-
-    const new_document_count = await Station.countDocuments()
-    expect(new_document_count).toBe(0)
+      const new_document_count = await Station.countDocuments()
+      expect(new_document_count).toBe(0)
+    })
   })
 })
