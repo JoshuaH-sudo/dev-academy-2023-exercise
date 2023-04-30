@@ -10,6 +10,7 @@ import { Request, Response } from "express"
 import debug from "debug"
 import Joi from "joi"
 import Config from "../models/config"
+import File_tracker from "../models/file_tracker"
 const debugLog = debug("app:Station_controller:log")
 const errorLog = debug("app:Station_controller:error")
 
@@ -38,6 +39,10 @@ export async function import_stations_csv_to_database() {
   for (const file of csv_files) {
     debugLog(`Importing ${file} to the database`)
     const csv_file_path = path.join(datasets_path, file)
+
+    // Add a file tracker to the config for each file that is being imported so the current line can be tracked.
+    await create_file_tracker(csv_file_path)
+
     read_csv_promises.push(read_csv_station_data(csv_file_path))
   }
 
@@ -47,6 +52,26 @@ export async function import_stations_csv_to_database() {
   await station_config.save()
 
   debugLog("All station csv files imported to the database")
+}
+
+export const create_file_tracker = async (file_name: string) => {
+  try {
+    const found_tracker = await File_tracker.findOne({ file_name })
+    if (found_tracker) return found_tracker
+
+    const new_file_tracker = new File_tracker({
+      file_name,
+      current_line: 1,
+    })
+    const file_tracker = await new_file_tracker.save()
+
+    const config = await get_config()
+    config.file_index_trackers.push(file_tracker._id)
+    return config.save()
+  } catch (error) {
+    errorLog("Failed to create station config file tracker :", error)
+    throw error
+  }
 }
 
 export const read_csv_station_data = async (filePath: string): Promise<void> => {
@@ -72,10 +97,9 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
         const Station_csv_data_validation = csv_station_schema.validate(record)
         if (Station_csv_data_validation.error) {
           //If the data is not valid, then log the error and continue.
-          errorLog(
-            "Invalid station data found, skipping it:",
-            Station_csv_data_validation.error
-          )
+          errorLog(`Invalid station data found, skipping it`)
+
+          await increment_file_tracker_index(filePath)
           continue
         }
 
@@ -98,7 +122,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
 
         //save the data to the database
         await save_station_data(results)
-        await update_station_config_file_line(filePath)
+        await increment_file_tracker_index(filePath)
       }
     })
 
@@ -107,11 +131,12 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
     })
 
     parser.on("skip", async (error) => {
-      await update_station_config_file_line(filePath)
-      // errorLog("Skipping line in csv file due to error :", error.message)
+      errorLog("Skipping station line in csv file", error.message)
+      await increment_file_tracker_index(filePath)
     })
 
     parser.on("error", (error: any) => {
+      errorLog("Error while reading station csv file", error.message)
       reject(error)
     })
 
@@ -122,19 +147,11 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
 
 export const get_index_for_file = async (file_name: string): Promise<number> => {
   try {
-    const config = await get_config()
+    const file_tracker = await File_tracker.findOne({ file_name })
 
-    const file_tracker = config.file_index_tracker.find(
-      (file) => file.file_name === file_name
-    )
-
+    debugLog(`File tracker: ${JSON.stringify(file_tracker)}`)
     if (!file_tracker) {
-      config.file_index_tracker.push({
-        file_name,
-        current_line: 1,
-      })
-      await config.save()
-      return 1
+      throw new Error(`File tracker for ${file_name} not found`)
     }
 
     return file_tracker.current_line
@@ -144,24 +161,19 @@ export const get_index_for_file = async (file_name: string): Promise<number> => 
   }
 }
 
-export const update_station_config_file_line = async (file_name: string) => {
+export const increment_file_tracker_index = async (file_name: string) => {
   try {
-    const config = await get_config()
-
-    const file_tracker = config.file_index_tracker.find(
-      (file) => file.file_name === file_name
-    )
+    const file_tracker = await File_tracker.findOne({ file_name })
 
     if (!file_tracker) {
-      throw new Error(`File ${file_name} for station config not found`)
+      throw new Error(`File tracker for ${file_name} not found`)
     }
 
     file_tracker.current_line += 1
+    await file_tracker.save()
 
-    debugLog(`Updating station config to line ${file_tracker.current_line}`)
-
-    const new_config = await config.save()
-    debugLog(`Config update: ${JSON.stringify(new_config)}`)
+    const config = await get_config()
+    debugLog(`Updated station config file line to ${config.file_index_trackers}`)
   } catch (error) {
     errorLog("Failed to update station config :", error)
     throw error
