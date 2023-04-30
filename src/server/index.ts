@@ -9,7 +9,6 @@ import fs from "fs"
 import app_router from "./routes/app"
 import journey_router from "./routes/journey"
 import station_router from "./routes/station"
-import { initialize_config_collection } from "./models/config"
 import { import_journey_csv_to_database } from "./controllers/journey"
 import { import_stations_csv_to_database } from "./controllers/station"
 
@@ -52,8 +51,6 @@ async function start_database() {
   try {
     debugLog("Initializing the database")
 
-    await initialize_config_collection()
-
     const journey_import = import_journey_csv_to_database()
     const station_import = import_stations_csv_to_database()
 
@@ -68,7 +65,8 @@ async function start_database() {
 }
 
 /**
- * Will try and retrieve the database URI from the MONGO_URI environment variable if it is defined, otherwise it will try to read the MONGO_URI_FILE environment variable and return the contents of the file.
+ * Will try and retrieve the database URI from the MONGO_URI environment variable if it is defined, 
+ * otherwise it will try to read the MONGO_URI_FILE environment variable and return the contents of the file.
  *
  * @returns The database URI
  */

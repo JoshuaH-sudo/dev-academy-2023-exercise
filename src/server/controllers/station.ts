@@ -31,13 +31,18 @@ export async function import_stations_csv_to_database() {
   }
 
   const csv_files = fs.readdirSync(datasets_path)
+
+  //Each file will be imported in parallel
+  const read_csv_promises: Promise<void>[] = []
   //loop through all the csv files in the datasets folder
   for (const file of csv_files) {
     debugLog(`Importing ${file} to the database`)
     const csv_file_path = path.join(datasets_path, file)
-    await read_csv_station_data(csv_file_path)
+    read_csv_promises.push(read_csv_station_data(csv_file_path))
   }
 
+  //Once all the files have been imported, update the config to reflect this
+  await Promise.all(read_csv_promises)
   station_config.loaded = true
   await station_config.save()
 
@@ -45,13 +50,13 @@ export async function import_stations_csv_to_database() {
 }
 
 export const read_csv_station_data = async (filePath: string): Promise<void> => {
-  const station_config = await get_config()
+  const start_line = await get_index_for_file(filePath)
 
   return new Promise((resolve, reject) => {
     //BOM is a byte order mark, which is a special character that is used to indicate the endianness of a file.
     //This is needed to ensure that the parser can read the file correctly.
     const parser = parse({
-      from_line: station_config.current_line,
+      from_line: start_line,
       bom: true,
       delimiter: ",",
       columns: true,
@@ -93,7 +98,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
 
         //save the data to the database
         await save_station_data(results)
-        await update_station_config_file_line()
+        await update_station_config_file_line(filePath)
       }
     })
 
@@ -102,7 +107,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
     })
 
     parser.on("skip", async (error) => {
-      await update_station_config_file_line()
+      await update_station_config_file_line(filePath)
       // errorLog("Skipping line in csv file due to error :", error.message)
     })
 
@@ -115,14 +120,48 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
   })
 }
 
-export const update_station_config_file_line = async () => {
+export const get_index_for_file = async (file_name: string): Promise<number> => {
   try {
     const config = await get_config()
 
-    config.current_line = config.current_line + 1
-    debugLog(`Updating station config to line ${config.current_line}`)
+    const file_tracker = config.file_index_tracker.find(
+      (file) => file.file_name === file_name
+    )
 
-    await config.save()
+    if (!file_tracker) {
+      config.file_index_tracker.push({
+        file_name,
+        current_line: 1,
+      })
+      await config.save()
+      return 1
+    }
+
+    return file_tracker.current_line
+  } catch (error) {
+    errorLog("Failed to get station config file index :", error)
+    throw error
+  }
+}
+
+export const update_station_config_file_line = async (file_name: string) => {
+  try {
+    const config = await get_config()
+
+    const file_tracker = config.file_index_tracker.find(
+      (file) => file.file_name === file_name
+    )
+
+    if (!file_tracker) {
+      throw new Error(`File ${file_name} for station config not found`)
+    }
+
+    file_tracker.current_line += 1
+
+    debugLog(`Updating station config to line ${file_tracker.current_line}`)
+
+    const new_config = await config.save()
+    debugLog(`Config update: ${JSON.stringify(new_config)}`)
   } catch (error) {
     errorLog("Failed to update station config :", error)
     throw error
@@ -135,13 +174,13 @@ export const get_config = async () => {
 
     if (!config) {
       debugLog("Creating new journey config")
-      const journey_config = new Config({
+      const station_config = new Config({
         data_type: "station",
         loaded: false,
-        current_line: 1,
+        file_index_tracker: [],
       })
 
-      return await journey_config.save()
+      return await station_config.save()
     }
 
     return config

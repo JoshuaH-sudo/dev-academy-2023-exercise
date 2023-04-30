@@ -66,7 +66,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     //This is needed to ensure that the parser can read the file correctly.
     const parser = parse({
       // Start at the line that is saved in the journey config
-      from_line: journey_config.current_line,
+      from_line: 1, //journey_config.current_line,
       bom: true,
       delimiter: ",",
       columns: true,
@@ -78,7 +78,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     parser.on("readable", async () => {
       let record: Journey_csv_data
       // Tracks the line that is currently being read from the csv file
-      let file_line = journey_config.current_line
+      // let file_line = journey_config.current_line
 
       while ((record = parser.read()) !== null) {
         //Validating the data from the csv file.
@@ -120,7 +120,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
         //save the data to the database
         await save_journey_data(results)
 
-        await update_journey_config_file_line()
+        // await update_journey_config_file_line()
       }
     })
 
@@ -129,7 +129,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     })
 
     parser.on("skip", (error) => {
-      update_journey_config_file_line()
+      // update_journey_config_file_line()
       // errorLog("Skipping line in csv file due to error :", error.message)
     })
 
@@ -146,8 +146,8 @@ export const update_journey_config_file_line = async () => {
   try {
     const config = await get_config()
 
-    config.current_line = config.current_line + 1
-    debugLog(`Updating journey config to line ${config.current_line}`)
+    // config.current_line = config.current_line + 1
+    // debugLog(`Updating journey config to line ${config.current_line}`)
 
     await config.save()
   } catch (error) {
