@@ -1,5 +1,6 @@
 import {
   clear_journeys,
+  create_file_tracker,
   import_journey_csv_to_database,
   read_csv_journey_data,
   save_journey_data,
@@ -60,6 +61,7 @@ describe("Journey Collection", () => {
     })
 
     it("Should parse valid journey data from csv file", async () => {
+      await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
 
       const stored_journey = await Journey.findOne({
@@ -70,6 +72,7 @@ describe("Journey Collection", () => {
     })
 
     it("Should not store journey data with duration of less than 10 seconds", async () => {
+      await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
       //Find a journey with a duration less than 10 seconds
       const stored_journey = await Journey.findOne({
@@ -80,6 +83,7 @@ describe("Journey Collection", () => {
     })
 
     it("Should not store journey data with cover distance of less than 10 meters", async () => {
+      await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
       //Find a journey with a duration less than 10 seconds
       const stored_journey = await Journey.findOne({
@@ -90,6 +94,7 @@ describe("Journey Collection", () => {
     })
 
     it("Should not parse invalid journey data from csv file", async () => {
+      await create_file_tracker(bad_journeys_csv_file)
       //No valid journey data is stored within this csv file
       await read_csv_journey_data(bad_journeys_csv_file)
 

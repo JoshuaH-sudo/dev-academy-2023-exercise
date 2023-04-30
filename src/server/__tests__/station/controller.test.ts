@@ -1,5 +1,6 @@
 import {
   clear_stations,
+  create_file_tracker,
   read_csv_station_data,
   save_station_data,
 } from "../../controllers/station"
@@ -34,6 +35,7 @@ describe("Station Collection", () => {
   })
 
   it("Should parse valid station data from csv file", async () => {
+    await create_file_tracker(good_stations_csv_file)
     await read_csv_station_data(good_stations_csv_file)
 
     const stored_station = await Station.findOne({
@@ -67,6 +69,7 @@ describe("Station Collection", () => {
     const document_count = await Station.countDocuments()
     expect(document_count).toBe(0)
 
+    await create_file_tracker(bad_stations_csv_file)
     //No valid station data is stored within this csv file
     await read_csv_station_data(bad_stations_csv_file)
 
