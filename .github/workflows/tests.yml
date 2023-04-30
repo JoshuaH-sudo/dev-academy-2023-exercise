@@ -2,6 +2,9 @@ name: Tests
 run-name: Test Runner
 
 on:
+  push:
+    branches:
+      - "*" # All branches
   pull_request:
     branches:
       - main
