@@ -83,6 +83,11 @@ describe("Journey Collection", () => {
     })
 
     it("Should not store journey data with cover distance of less than 10 meters", async () => {
+      const journey_controller = require("../../controllers/journey")
+      jest
+        .spyOn(journey_controller, "increment_file_tracker_index")
+        .mockResolvedValue(1)
+
       await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
       //Find a journey with a duration less than 10 seconds

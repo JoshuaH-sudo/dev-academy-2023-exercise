@@ -1,6 +1,7 @@
 import {
   clear_stations,
   create_file_tracker,
+  increment_file_tracker_index,
   read_csv_station_data,
   save_station_data,
 } from "../../controllers/station"
@@ -60,7 +61,12 @@ describe("Station Collection", () => {
 
   describe("Station CSV Import", () => {
     it("Should not store station data with cover distance of less than 10 meters", async () => {
-      await create_file_tracker(good_stations_csv_file)
+      // Mock increment_file_tracker_index to return 0
+      const station_controller = require("../../controllers/station")
+      jest
+        .spyOn(station_controller, "increment_file_tracker_index")
+        .mockResolvedValue(1)
+
       await read_csv_station_data(good_stations_csv_file)
       //Find a station with a duration less than 10 seconds
       const stored_station = await Station.findOne({
@@ -71,6 +77,10 @@ describe("Station Collection", () => {
     })
 
     it("Should not parse invalid station data from csv file", async () => {
+      const station_controller = require("../../controllers/station")
+      jest
+        .spyOn(station_controller, "increment_file_tracker_index")
+        .mockResolvedValue(1)
       const document_count = await Station.countDocuments()
       expect(document_count).toBe(0)
 
