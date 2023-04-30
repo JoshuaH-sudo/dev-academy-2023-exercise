@@ -36,19 +36,22 @@ export async function import_journey_csv_to_database() {
     return
   }
 
-  await clear_journeys()
-
   try {
     // Find all the csv files in the datasets folder
     const csv_files = fs.readdirSync(journey_datasets_path)
 
+    const read_csv_promises: Promise<void>[] = []
     // Loop through all the csv files in the datasets folder
     for (const file of csv_files) {
       debugLog(`Importing ${file} to the database`)
       const csv_file_path = path.join(journey_datasets_path, file)
-      await read_csv_journey_data(csv_file_path)
+
+      await create_file_tracker(csv_file_path)
+
+      read_csv_promises.push(read_csv_journey_data(csv_file_path))
     }
 
+    await Promise.all(read_csv_promises)
     journey_config.loaded = true
     await journey_config.save()
 
@@ -59,15 +62,33 @@ export async function import_journey_csv_to_database() {
   }
 }
 
+export const create_file_tracker = async (file_name: string) => {
+  try {
+    const found_tracker = await File_tracker.findOne({ file_name })
+    if (found_tracker) return found_tracker
+
+    const new_file_tracker = new File_tracker({
+      file_name,
+      current_line: 1,
+    })
+    const file_tracker = await new_file_tracker.save()
+
+    const config = await get_config()
+    config.file_index_trackers.push(file_tracker._id)
+    return config.save()
+  } catch (error) {
+    errorLog("Failed to create station config file tracker :", error)
+    throw error
+  }
+}
 export const read_csv_journey_data = async (filePath: string): Promise<void> => {
-  const journey_config = await get_config()
+  const start_line = await get_index_for_file(filePath)
 
   return new Promise((resolve, reject) => {
     //BOM is a byte order mark, which is a special character that is used to indicate the endianness of a file.
     //This is needed to ensure that the parser can read the file correctly.
     const parser = parse({
-      // Start at the line that is saved in the journey config
-      from_line: 1, //journey_config.current_line,
+      from_line: start_line,
       bom: true,
       delimiter: ",",
       columns: true,
@@ -79,7 +100,6 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     parser.on("readable", async () => {
       let record: Journey_csv_data
       // Tracks the line that is currently being read from the csv file
-      // let file_line = journey_config.current_line
 
       while ((record = parser.read()) !== null) {
         //Validating the data from the csv file.
@@ -131,9 +151,9 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
       resolve()
     })
 
-    parser.on("skip", (error) => {
-      // update_journey_config_file_line()
-      // errorLog("Skipping line in csv file due to error :", error.message)
+    parser.on("skip", async (error) => {
+      errorLog("Skipping journey line in csv file", error.message)
+      await increment_file_tracker_index(filePath)
     })
 
     parser.on("error", (error: any) => {

@@ -31,27 +31,32 @@ export async function import_stations_csv_to_database() {
     return
   }
 
-  const csv_files = fs.readdirSync(datasets_path)
+  try {
+    const csv_files = fs.readdirSync(datasets_path)
 
-  //Each file will be imported in parallel
-  const read_csv_promises: Promise<void>[] = []
-  //loop through all the csv files in the datasets folder
-  for (const file of csv_files) {
-    debugLog(`Importing ${file} to the database`)
-    const csv_file_path = path.join(datasets_path, file)
+    //Each file will be imported in parallel
+    const read_csv_promises: Promise<void>[] = []
+    //loop through all the csv files in the datasets folder
+    for (const file of csv_files) {
+      debugLog(`Importing ${file} to the database`)
+      const csv_file_path = path.join(datasets_path, file)
 
-    // Add a file tracker to the config for each file that is being imported so the current line can be tracked.
-    await create_file_tracker(csv_file_path)
+      // Add a file tracker to the config for each file that is being imported so the current line can be tracked.
+      await create_file_tracker(csv_file_path)
 
-    read_csv_promises.push(read_csv_station_data(csv_file_path))
+      read_csv_promises.push(read_csv_station_data(csv_file_path))
+    }
+
+    //Once all the files have been imported, update the config to reflect this
+    await Promise.all(read_csv_promises)
+    station_config.loaded = true
+    await station_config.save()
+
+    debugLog("All station csv files imported to the database")
+  } catch (error) {
+    errorLog("Failed to import csv datasets to database :", error)
+    throw error
   }
-
-  //Once all the files have been imported, update the config to reflect this
-  await Promise.all(read_csv_promises)
-  station_config.loaded = true
-  await station_config.save()
-
-  debugLog("All station csv files imported to the database")
 }
 
 export const create_file_tracker = async (file_name: string) => {
