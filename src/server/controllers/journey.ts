@@ -9,6 +9,7 @@ import { Request, Response } from "express"
 import debug from "debug"
 import Joi from "joi"
 import Config from "../models/config"
+import File_tracker from "../models/file_tracker"
 const debugLog = debug("app:journey_controller:log")
 const errorLog = debug("app:journey_controller:error")
 
@@ -89,16 +90,19 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
             "Invalid journey data found, skipping it",
             journey_csv_data_validation.error
           )
+          await increment_file_tracker_index(filePath)
           continue
         }
         //Check that journey is longer than 10 seconds
         if (parseInt(record["Duration (sec.)"]) < 10) {
           //skip this record
+          await increment_file_tracker_index(filePath)
           continue
         }
         //Check that journey is longer than 10 meters
         if (parseInt(record["Covered distance (m)"]) < 10) {
           //skip this record
+          await increment_file_tracker_index(filePath)
           continue
         }
         //Translating the data from the csv file to the data format that is easier to use and store in the application.
@@ -119,8 +123,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
 
         //save the data to the database
         await save_journey_data(results)
-
-        // await update_journey_config_file_line()
+        await increment_file_tracker_index(filePath)
       }
     })
 
@@ -142,16 +145,33 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
   })
 }
 
-export const update_journey_config_file_line = async () => {
+export const get_index_for_file = async (file_name: string): Promise<number> => {
   try {
-    const config = await get_config()
+    const file_tracker = await File_tracker.findOne({ file_name })
 
-    // config.current_line = config.current_line + 1
-    // debugLog(`Updating journey config to line ${config.current_line}`)
+    if (!file_tracker) {
+      throw new Error(`File tracker for ${file_name} not found`)
+    }
 
-    await config.save()
+    return file_tracker.current_line
   } catch (error) {
-    errorLog("Failed to update journey config :", error)
+    errorLog("Failed to get station config file index :", error)
+    throw error
+  }
+}
+
+export const increment_file_tracker_index = async (file_name: string) => {
+  try {
+    const file_tracker = await File_tracker.findOne({ file_name })
+
+    if (!file_tracker) {
+      throw new Error(`File tracker for ${file_name} not found`)
+    }
+
+    file_tracker.current_line += 1
+    await file_tracker.save()
+  } catch (error) {
+    errorLog("Failed to update station config :", error)
     throw error
   }
 }
@@ -162,13 +182,13 @@ export const get_config = async () => {
 
     if (!config) {
       debugLog("Creating new journey config")
-      const journey_config = new Config({
+      const station_config = new Config({
         data_type: "journey",
         loaded: false,
-        current_line: 1,
+        file_index_tracker: [],
       })
 
-      return await journey_config.save()
+      return await station_config.save()
     }
 
     return config

@@ -1,7 +1,7 @@
 import path from "path"
 import { parse } from "csv-parse"
 import fs from "fs"
-import station, { csv_station_schema } from "../models/station"
+import { csv_station_schema } from "../models/station"
 import Station from "../models/station"
 import Journey from "../models/journey"
 import { Station_csv_data, Station_data, Stored_station_data } from "../../common"
@@ -149,7 +149,6 @@ export const get_index_for_file = async (file_name: string): Promise<number> => 
   try {
     const file_tracker = await File_tracker.findOne({ file_name })
 
-    debugLog(`File tracker: ${JSON.stringify(file_tracker)}`)
     if (!file_tracker) {
       throw new Error(`File tracker for ${file_name} not found`)
     }
@@ -171,9 +170,6 @@ export const increment_file_tracker_index = async (file_name: string) => {
 
     file_tracker.current_line += 1
     await file_tracker.save()
-
-    const config = await get_config()
-    debugLog(`Updated station config file line to ${config.file_index_trackers}`)
   } catch (error) {
     errorLog("Failed to update station config :", error)
     throw error
@@ -185,7 +181,7 @@ export const get_config = async () => {
     const config = await Config.findOne({ data_type: "station" })
 
     if (!config) {
-      debugLog("Creating new journey config")
+      debugLog("Creating new station config")
       const station_config = new Config({
         data_type: "station",
         loaded: false,
@@ -201,6 +197,7 @@ export const get_config = async () => {
     throw error
   }
 }
+
 export function save_station_data(data: Station_data) {
   const new_station = new Station(data)
   return new_station.save()
