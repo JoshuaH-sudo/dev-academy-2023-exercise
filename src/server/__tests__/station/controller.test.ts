@@ -8,6 +8,7 @@ import {
 import { dummy_station_A } from "../../../__mocks__/data"
 import Station from "../../models/station"
 import path from "path"
+import File_tracker from "../../models/file_tracker"
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "stations")
 const good_stations_csv_file = path.join(mock_datasets_path, "good_stations.csv")
@@ -37,6 +38,11 @@ describe("Station Collection", () => {
     })
 
     it("Should parse valid station data from csv file", async () => {
+      jest.spyOn(File_tracker, "findOne").mockResolvedValue({
+        current_line: 1,
+        file_name: good_stations_csv_file,
+      })
+
       await create_file_tracker(good_stations_csv_file)
       await read_csv_station_data(good_stations_csv_file)
 
@@ -48,6 +54,10 @@ describe("Station Collection", () => {
     })
 
     it("Should not store station data with duration of less than 10 seconds", async () => {
+      jest.spyOn(File_tracker, "findOne").mockResolvedValue({
+        current_line: 1,
+        file_name: good_stations_csv_file,
+      })
       await create_file_tracker(good_stations_csv_file)
       await read_csv_station_data(good_stations_csv_file)
       //Find a station with a duration less than 10 seconds
@@ -61,11 +71,10 @@ describe("Station Collection", () => {
 
   describe("Station CSV Import", () => {
     it("Should not store station data with cover distance of less than 10 meters", async () => {
-      // Mock increment_file_tracker_index to return 0
-      const station_controller = require("../../controllers/station")
-      jest
-        .spyOn(station_controller, "increment_file_tracker_index")
-        .mockResolvedValue(1)
+      jest.spyOn(File_tracker, "findOne").mockResolvedValue({
+        current_line: 1,
+        file_name: good_stations_csv_file,
+      })
 
       await read_csv_station_data(good_stations_csv_file)
       //Find a station with a duration less than 10 seconds
@@ -77,10 +86,10 @@ describe("Station Collection", () => {
     })
 
     it("Should not parse invalid station data from csv file", async () => {
-      const station_controller = require("../../controllers/station")
-      jest
-        .spyOn(station_controller, "increment_file_tracker_index")
-        .mockResolvedValue(1)
+      jest.spyOn(File_tracker, "findOne").mockResolvedValue({
+        current_line: 1,
+        file_name: bad_stations_csv_file,
+      })
       const document_count = await Station.countDocuments()
       expect(document_count).toBe(0)
 
