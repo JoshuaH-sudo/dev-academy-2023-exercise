@@ -9,7 +9,9 @@ import { dummy_station_A } from "../../../__mocks__/data"
 import Station from "../../models/station"
 import path from "path"
 import File_tracker from "../../models/file_tracker"
-import fs from "fs"
+import fs from 'fs';
+jest.mock('fs');
+
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "stations")
 const good_stations_csv_file = path.join(mock_datasets_path, "good_stations.csv")
@@ -74,11 +76,8 @@ describe("Station Collection", () => {
 
   describe("Station CSV Import", () => {
     it("file_tracker should be created if it does not exist", async () => {
-      jest.mock("fs")
-      //@ts-ignore - mocking fs.readFileSync
-      fs.readFileSync.mockImplementationOnce(() => {
-        return [good_stations_csv_file]
-      })
+      //@ts-ignore - Will return the list of paths to the mock csv files
+      jest.spyOn(fs, "readdirSync").mockReturnValueOnce([good_stations_csv_file])
 
       await import_stations_csv_to_database()
 

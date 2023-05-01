@@ -8,8 +8,10 @@ import {
 import { dummy_journey_A } from "../../../__mocks__/data"
 import Journey from "../../models/journey"
 import path from "path"
-import fs from "fs"
 import File_tracker from "../../models/file_tracker"
+
+import fs from 'fs';
+jest.mock('fs');
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "journeys")
 const good_journeys_csv_file = path.join(mock_datasets_path, "good_journeys.csv")
@@ -54,11 +56,9 @@ describe("Journey Collection", () => {
 
   describe("Journey CSV Import", () => {
     it("file_tracker should be created if it does not exist", async () => {
-      jest.mock("fs")
-      //@ts-ignore - mocking fs.readFileSync
-      fs.readFileSync.mockImplementationOnce(() => {
-        return [good_journeys_csv_file]
-      })
+      //@ts-ignore - fs will be mocked
+      jest.spyOn(fs, "readdirSync").mockReturnValueOnce([good_journeys_csv_file])
+      
       await import_journey_csv_to_database()
 
       const file_tracker = await File_tracker.findOne({
