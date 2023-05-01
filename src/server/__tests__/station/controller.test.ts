@@ -10,7 +10,6 @@ import Station from "../../models/station"
 import path from "path"
 import File_tracker from "../../models/file_tracker"
 import fs from 'fs';
-jest.mock('fs');
 
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "stations")
