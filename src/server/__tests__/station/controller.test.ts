@@ -77,9 +77,10 @@ describe("Station Collection", () => {
   describe("Station CSV Import", () => {
     it("file_tracker should be created if it does not exist", async () => {
       //@ts-ignore - Will return the list of paths to the mock csv files
-      jest.spyOn(fs, "readdirSync").mockReturnValueOnce([good_stations_csv_file])
+      fs.readdirSync.mockReturnValueOnce([good_stations_csv_file])
+      // jest.spyOn(fs, "readdirSync").mockReturnValueOnce([good_stations_csv_file])
       //@ts-ignore - Will return the list of paths to the mock csv files
-      jest.spyOn(fs,"createReadStream").mockReturnValueOnce({ pipe: jest.fn() })
+      // jest.spyOn(fs,"createReadStream").mockReturnValueOnce({ pipe: jest.fn() })
       
       await import_stations_csv_to_database()
 
