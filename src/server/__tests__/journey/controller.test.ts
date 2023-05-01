@@ -1,6 +1,7 @@
 import {
   clear_journeys,
   create_file_tracker,
+  get_config,
   import_journey_csv_to_database,
   read_csv_journey_data,
   save_journey_data,
@@ -50,6 +51,15 @@ describe("Journey Collection", () => {
       })
 
       await expect(clear_journeys()).rejects.toThrow("Error")
+    })
+  })
+
+  describe("Config", () => {
+    it("Should create a config document if it does not exist", async () => {
+      await get_config()
+
+      const config = await Config.findOne({ data_type: "journey" })
+      expect(config).toBeDefined()
     })
   })
 

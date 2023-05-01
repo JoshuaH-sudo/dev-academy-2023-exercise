@@ -1,6 +1,7 @@
 import {
   clear_stations,
   create_file_tracker,
+  get_config,
   import_stations_csv_to_database,
   read_csv_station_data,
   save_station_data,
@@ -72,19 +73,32 @@ describe("Station Collection", () => {
     })
   })
 
+  describe("Config", () => {
+    it("Should create a config document if it does not exist", async () => {
+      await get_config()
+
+      const config = await Config.findOne({ data_type: "station" })
+      expect(config).toBeDefined()
+    })
+  })
+
   describe("Station CSV Import", () => {
     it("Should not import if journeys are loaded", async () => {
-      await new Config({ data_type: "station", loaded: true, file_index_trackers: [] }).save()
+      await new Config({
+        data_type: "station",
+        loaded: true,
+        file_index_trackers: [],
+      }).save()
 
       await import_stations_csv_to_database()
-      
+
       const station_count = await Station.countDocuments()
       expect(station_count).toBe(0)
     })
 
     it("file tracker should be created if it does not exist", async () => {
       await create_file_tracker(good_stations_csv_file)
-      
+
       const file_tracker = await File_tracker.findOne({
         file_name: good_stations_csv_file,
       })
