@@ -58,7 +58,9 @@ describe("Journey Collection", () => {
     it("file_tracker should be created if it does not exist", async () => {
       //@ts-ignore - fs will be mocked
       jest.spyOn(fs, "readdirSync").mockReturnValueOnce([good_journeys_csv_file])
-      
+      //@ts-ignore - fs will be mocked
+      jest.spyOn(fs,"createReadStream").mockReturnValueOnce({ pipe: jest.fn() })
+
       await import_journey_csv_to_database()
 
       const file_tracker = await File_tracker.findOne({
