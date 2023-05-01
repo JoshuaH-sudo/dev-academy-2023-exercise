@@ -41,6 +41,7 @@ describe("Station Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: good_stations_csv_file,
+        save: jest.fn(),
       })
 
       await create_file_tracker(good_stations_csv_file)
@@ -57,6 +58,7 @@ describe("Station Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: good_stations_csv_file,
+        save: jest.fn(),
       })
       await create_file_tracker(good_stations_csv_file)
       await read_csv_station_data(good_stations_csv_file)
@@ -74,6 +76,7 @@ describe("Station Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: good_stations_csv_file,
+        save: jest.fn(),
       })
 
       await read_csv_station_data(good_stations_csv_file)
@@ -89,6 +92,7 @@ describe("Station Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: bad_stations_csv_file,
+        save: jest.fn(),
       })
       const document_count = await Station.countDocuments()
       expect(document_count).toBe(0)

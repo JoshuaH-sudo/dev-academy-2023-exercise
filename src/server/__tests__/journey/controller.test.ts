@@ -65,6 +65,7 @@ describe("Journey Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: good_journeys_csv_file,
+        save: jest.fn(),
       })
       await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
@@ -80,6 +81,7 @@ describe("Journey Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: good_journeys_csv_file,
+        save: jest.fn(),
       })
       await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
@@ -95,6 +97,7 @@ describe("Journey Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: good_journeys_csv_file,
+        save: jest.fn(),
       })
       await create_file_tracker(good_journeys_csv_file)
       await read_csv_journey_data(good_journeys_csv_file)
@@ -110,6 +113,7 @@ describe("Journey Collection", () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
         file_name: bad_journeys_csv_file,
+        save: jest.fn(),
       })
       await create_file_tracker(bad_journeys_csv_file)
       //No valid journey data is stored within this csv file
