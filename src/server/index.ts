@@ -71,21 +71,13 @@ async function start_database() {
  * @returns The database URI
  */
 export const get_mongo_uri = async (): Promise<string> => {
-    console.debug("mongo uri " + process.env.MONGO_URI)
-    console.debug("mongo uri typeof " + typeof process.env.MONGO_URI)
-    console.debug("mongo uri file " + process.env.MONGO_URI_FILE)
-    console.debug(process.env.MONGO_URI === undefined)
-    console.debug(typeof process.env.MONGO_URI === typeof undefined)
   if (process.env.MONGO_URI !== undefined) {
-    console.debug("accessing mongo uri")
     //If the MONGO_URI is defined, return it
     return process.env.MONGO_URI
   } else {
     debugLog(
       "MONGO_URI is not defined, trying to read it from the MONGO_URI_FILE environment variable"
     )
-    console.debug("MONGO_URI_FILE")
-    console.debug(process.env.MONGO_URI_FILE)
     //If the MONGO_URI is not defined, try to read it from the MONGO_URI_FILE environment variable
     if (process.env.MONGO_URI_FILE !== undefined) {
       try {
@@ -93,7 +85,6 @@ export const get_mongo_uri = async (): Promise<string> => {
           encoding: "utf-8",
         })
       } catch (error) {
-        console.debug(error)
         errorLog(
           "MONGO_URI_FILE is defined but the file could not be read, please check that the file exists and that the user has read permissions"
         )
