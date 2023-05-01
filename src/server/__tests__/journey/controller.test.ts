@@ -9,7 +9,8 @@ import { dummy_journey_A } from "../../../__mocks__/data"
 import Journey from "../../models/journey"
 import path from "path"
 import File_tracker from "../../models/file_tracker"
-import fs from 'fs';
+import fs from "fs"
+import Config from "../../models/config"
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "journeys")
 const good_journeys_csv_file = path.join(mock_datasets_path, "good_journeys.csv")
@@ -53,6 +54,19 @@ describe("Journey Collection", () => {
   })
 
   describe("Journey CSV Import", () => {
+    it("Should not import if journeys are loaded", async () => {
+      await new Config({
+        data_type: "journey",
+        loaded: true,
+        file_index_trackers: [],
+      }).save()
+
+      await import_journey_csv_to_database()
+
+      const station_count = await Journey.countDocuments()
+      expect(station_count).toBe(0)
+    })
+
     it("file_tracker should be created if it does not exist", async () => {
       await create_file_tracker(good_journeys_csv_file)
 
