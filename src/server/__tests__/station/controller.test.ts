@@ -76,10 +76,7 @@ describe("Station Collection", () => {
 
   describe("Station CSV Import", () => {
     it("file_tracker should be created if it does not exist", async () => {
-      //@ts-ignore - Will return the list of paths to the mock csv files
-      fs.readdirSync.mockReturnValueOnce([good_stations_csv_file])
-      //@ts-ignore 
-      fs.createReadStream.mockReturnValueOnce({ pipe: jest.fn() })
+      await create_file_tracker(good_stations_csv_file)
       
       await import_stations_csv_to_database()
 
