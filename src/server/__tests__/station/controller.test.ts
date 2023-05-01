@@ -1,7 +1,7 @@
 import {
   clear_stations,
   create_file_tracker,
-  increment_file_tracker_index,
+  import_stations_csv_to_database,
   read_csv_station_data,
   save_station_data,
 } from "../../controllers/station"
@@ -9,6 +9,7 @@ import { dummy_station_A } from "../../../__mocks__/data"
 import Station from "../../models/station"
 import path from "path"
 import File_tracker from "../../models/file_tracker"
+import fs from "fs"
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "stations")
 const good_stations_csv_file = path.join(mock_datasets_path, "good_stations.csv")
@@ -72,6 +73,18 @@ describe("Station Collection", () => {
   })
 
   describe("Station CSV Import", () => {
+    it("file_tracker should be created if it does not exist", async () => {
+      jest.spyOn(fs, "readdirSync").mockImplementationOnce(() => [good_stations_csv_file])
+      await import_stations_csv_to_database()
+
+      const file_tracker = await File_tracker.findOne({
+        file_name: good_stations_csv_file,
+      })
+
+      expect(file_tracker).toBeDefined()
+      expect(file_tracker?.current_line).toBe(1)
+    })
+
     it("Should not store station data with cover distance of less than 10 meters", async () => {
       jest.spyOn(File_tracker, "findOne").mockResolvedValue({
         current_line: 1,
