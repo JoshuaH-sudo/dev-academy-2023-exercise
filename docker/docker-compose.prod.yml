@@ -6,15 +6,12 @@ services:
       context: ../
       dockerfile: ./docker/dockerfile.prod.yml
     working_dir: /home/node/app
-    # Set the MONGO URI to a file so that it can be read from the secrets manager.
     environment:
       PORT: 8080
       NODE_ENV: production
-      MONGO_URI_FILE: /run/secrets/db_mongo_uri
+      MONGO_URI: mongodb://app_database:27017
     ports:
       - "8080:8080"
-    secrets:
-      - db_mongo_uri
     depends_on:
       - app_database
 
@@ -22,23 +19,9 @@ services:
     container_name: app_database
     image: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME_FILE: /run/secrets/db_username
-      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_password
     ports:
       - "27017:27017"
-    secrets:
-      - db_username
-      - db_password
     volumes:
       - mongo-data:/data/db
-
-secrets:
-  db_username:
-    file: ../environment/db_root_username.env
-  db_password:
-    file: ../environment/db_root_password.env
-  db_mongo_uri:
-    file: ../environment/db_mongo_uri.env
 volumes:
   mongo-data:

@@ -10,7 +10,6 @@ services:
       PORT: 8080
       NODE_ENV: production
       MONGO_URI: mongodb://app_database:27017
-      # MONGO_URI_FILE: /run/secrets/db_mongo_uri
     ports:
       - "8080:8080"
     depends_on:
