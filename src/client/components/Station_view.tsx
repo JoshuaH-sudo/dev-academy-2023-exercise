@@ -14,7 +14,7 @@ import {
 } from "@elastic/eui"
 import { Stored_station_data } from "../../common"
 import {
-  Get_stations_query_params,
+  Pagination_query_params,
   Station_query_result,
 } from "../../server/controllers/station"
 import Single_station_view from "./single_station_view/Single_station_view"
@@ -43,7 +43,7 @@ const Station_view = () => {
       if (!sorting || !sorting.sort) throw "Sorting is not defined"
 
       //Sorting needs to be manually controlled while using filters and pagination
-      const params: Get_stations_query_params = {
+      const params: Pagination_query_params = {
         page: pagination.pageIndex,
         limit: pagination.pageSize,
         sort: sorting.sort.field,

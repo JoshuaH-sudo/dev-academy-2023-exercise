@@ -16,7 +16,7 @@ import moment from "moment"
 import { uniqBy } from "lodash"
 import { Journey_data, Stored_journey_data } from "../../common"
 import {
-  Get_journeys_query_params,
+  Pagination_query_params,
   Journey_query_result,
 } from "../../server/controllers/journey"
 
@@ -42,7 +42,7 @@ const Journey_view = () => {
       if (!sorting || !sorting.sort) throw "Sorting is not defined"
 
       //Sorting needs to be manually controlled while using filters and pagination
-      const params: Get_journeys_query_params = {
+      const params: Pagination_query_params = {
         page: pagination.pageIndex,
         limit: pagination.pageSize,
         sort: sorting.sort.field,

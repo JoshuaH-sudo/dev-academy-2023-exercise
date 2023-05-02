@@ -7,22 +7,27 @@ import Journey from "../models/journey"
 import { Station_csv_data, Station_data, Stored_station_data } from "../../common"
 import { Request, Response } from "express"
 
-import debug from "debug"
 import Joi from "joi"
 import Config from "../models/config"
 import File_tracker from "../models/file_tracker"
+
+import debug from "debug"
 const debug_log = debug("app:Station_controller:log")
 const error_log = debug("app:Station_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets", "stations")
 
-//Clear all Stations from the database
+/**
+ * Clear all the stations from the database
+ */
 export const clear_stations = async () => {
   debug_log("Clearing Stations from the database")
   return Station.deleteMany({})
 }
 
-//import all the csv files in the datasets folder to the database
+/**
+ * Import all the stations from the csv files to the database
+ */
 export const import_stations_csv_to_database = async () => {
   const station_config = await get_config()
 
@@ -59,6 +64,12 @@ export const import_stations_csv_to_database = async () => {
   }
 }
 
+/**
+ * Create a file tracker for the given file if it does not exist already.
+ *  
+ * @param file_name The file to track
+ * @returns The created file tracker or the existing one if it already exists.
+ */
 export const create_file_tracker = async (file_name: string) => {
   try {
     const found_tracker = await File_tracker.findOne({ file_name })
@@ -81,8 +92,13 @@ export const create_file_tracker = async (file_name: string) => {
   }
 }
 
-export const read_csv_station_data = async (filePath: string): Promise<void> => {
-  const start_line = await get_index_for_file(filePath)
+/**
+ * Parse and validate the csv data and save it to the database.
+ *  
+ * @param file_path The path to the csv file to read
+ */
+export const read_csv_station_data = async (file_path: string): Promise<void> => {
+  const start_line = await get_index_for_file(file_path)
 
   return new Promise((resolve, reject) => {
     //BOM is a byte order mark, which is a special character that is used to indicate the endianness of a file.
@@ -106,7 +122,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
           //If the data is not valid, then log the error and continue.
           error_log(`Invalid station data found, skipping it`)
 
-          await increment_file_tracker_index(filePath)
+          await increment_file_tracker_index(file_path)
           continue
         }
 
@@ -129,7 +145,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
 
         //save the data to the database
         await save_station_data(results)
-        await increment_file_tracker_index(filePath)
+        await increment_file_tracker_index(file_path)
       }
     })
 
@@ -139,7 +155,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
 
     parser.on("skip", async (error) => {
       error_log("Skipping station line in csv file", error.message)
-      await increment_file_tracker_index(filePath)
+      await increment_file_tracker_index(file_path)
     })
 
     parser.on("error", (error: any) => {
@@ -148,10 +164,16 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
     })
 
     //Read the csv file and pipe it to the parser.
-    fs.createReadStream(filePath).pipe(parser)
+    fs.createReadStream(file_path).pipe(parser)
   })
 }
 
+/**
+ * Gets the index of the file tracker for the given file. 
+ *  
+ * @param file_name The file to get the index for
+ * @returns The index 
+ */
 export const get_index_for_file = async (file_name: string): Promise<number> => {
   try {
     const file_tracker = await File_tracker.findOne({ file_name })
@@ -167,6 +189,11 @@ export const get_index_for_file = async (file_name: string): Promise<number> => 
   }
 }
 
+/**
+ * Increments the index of the file tracker for the given file.
+ *  
+ * @param file_name The file to increment the index for
+ */
 export const increment_file_tracker_index = async (file_name: string) => {
   try {
     const file_tracker = await File_tracker.findOne({ file_name })
@@ -183,6 +210,11 @@ export const increment_file_tracker_index = async (file_name: string) => {
   }
 }
 
+/**
+ * Returns the station config or creates a new one if it does not exist.
+ *  
+ * @returns The station config
+ */
 export const get_config = async () => {
   try {
     const config = await Config.findOne({ data_type: "station" })
@@ -205,14 +237,32 @@ export const get_config = async () => {
   }
 }
 
+/**
+ * Saves the given station data to the database.
+ *  
+ * @param data The station data to save 
+ * @returns The new station document 
+ */
 export function save_station_data(data: Station_data) {
   const new_station = new Station(data)
   return new_station.save()
 }
 
+/**
+ * The return data from journey table pagination query
+ */
 export interface Station_query_result {
+  /**
+   * The journeys that were found
+   */
   stations: Stored_station_data[]
+  /**
+   * The total number of journeys in the collection
+   */
   total_stations: number
+  /**
+   * The total number of pages in the collection defined by the limit
+   */
   total_pages: number
 }
 
@@ -223,7 +273,7 @@ const get_stations_params_schema = Joi.object({
   sort: Joi.string().valid("nimi", "namn", "osoite", "kapasiteet").required(),
 })
 
-export interface Get_stations_query_params {
+export interface Pagination_query_params {
   page: string | number
   limit: string | number
   order: "asc" | "desc"
@@ -231,7 +281,7 @@ export interface Get_stations_query_params {
 }
 //Get all stations with pagination
 export const get_stations = async (
-  req: Request<{}, {}, {}, Get_stations_query_params>,
+  req: Request<{}, {}, {}, Pagination_query_params>,
   res: Response
 ) => {
   try {

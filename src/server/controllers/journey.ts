@@ -6,17 +6,20 @@ import { csv_journey_schema } from "../models/journey"
 import Journey from "../models/journey"
 import { Request, Response } from "express"
 
-import debug from "debug"
 import Joi from "joi"
 import Config from "../models/config"
 import File_tracker from "../models/file_tracker"
+
+import debug from "debug"
 const debug_log = debug("app:journey_controller:log")
 const error_log = debug("app:journey_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets")
 const journey_datasets_path = path.join(datasets_path, "journeys")
 
-//Clear all journeys from the database
+/**
+ * Clears all journey data from the database
+ */
 export const clear_journeys = async () => {
   try {
     debug_log("Clearing journeys from the database")
@@ -27,7 +30,9 @@ export const clear_journeys = async () => {
   }
 }
 
-//import all the csv files in the datasets folder to the database
+/**
+ * Import journey data from csv files to the database
+ */
 export const import_journey_csv_to_database = async () => {
   const journey_config = await get_config()
 
@@ -62,6 +67,13 @@ export const import_journey_csv_to_database = async () => {
   }
 }
 
+/**
+ * Creates a file tracker for the given file if it does not exist already. 
+ * Will push the file tracker to the config file index trackers array.
+ *  
+ * @param file_name The path to the file to track
+ * @returns The newly created / returned file tracker document 
+ */
 export const create_file_tracker = async (file_name: string) => {
   try {
     const found_tracker = await File_tracker.findOne({ file_name })
@@ -85,8 +97,13 @@ export const create_file_tracker = async (file_name: string) => {
   }
 }
 
-export const read_csv_journey_data = async (filePath: string): Promise<void> => {
-  const start_line = await get_index_for_file(filePath)
+/**
+ * Read and parse the data from the csv file and save it to the database.
+ *  
+ * @param file_path The path to the file to get the index for
+ */
+export const read_csv_journey_data = async (file_path: string): Promise<void> => {
+  const start_line = await get_index_for_file(file_path)
 
   return new Promise((resolve, reject) => {
     //BOM is a byte order mark, which is a special character that is used to indicate the endianness of a file.
@@ -114,19 +131,19 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
             "Invalid journey data found, skipping it",
             journey_csv_data_validation.error
           )
-          await increment_file_tracker_index(filePath)
+          await increment_file_tracker_index(file_path)
           continue
         }
         //Check that journey is longer than 10 seconds
         if (parseInt(record["Duration (sec.)"]) < 10) {
           //skip this record
-          await increment_file_tracker_index(filePath)
+          await increment_file_tracker_index(file_path)
           continue
         }
         //Check that journey is longer than 10 meters
         if (parseInt(record["Covered distance (m)"]) < 10) {
           //skip this record
-          await increment_file_tracker_index(filePath)
+          await increment_file_tracker_index(file_path)
           continue
         }
         //Translating the data from the csv file to the data format that is easier to use and store in the application.
@@ -147,7 +164,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
 
         //save the data to the database
         await save_journey_data(results)
-        await increment_file_tracker_index(filePath)
+        await increment_file_tracker_index(file_path)
       }
     })
 
@@ -157,7 +174,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
 
     parser.on("skip", async (error) => {
       error_log("Skipping journey line in csv file", error.message)
-      await increment_file_tracker_index(filePath)
+      await increment_file_tracker_index(file_path)
     })
 
     parser.on("error", (error: any) => {
@@ -165,10 +182,16 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     })
 
     //Read the csv file and pipe it to the parser.
-    fs.createReadStream(filePath).pipe(parser)
+    fs.createReadStream(file_path).pipe(parser)
   })
 }
 
+/**
+ * Get the current index for the given file via the File_tracker collection.
+ *  
+ * @param file_name The path to the file to get the index for
+ * @returns The current_line from the file tracker document 
+ */
 export const get_index_for_file = async (file_name: string): Promise<number> => {
   try {
     const file_tracker = await File_tracker.findOne({ file_name })
@@ -184,6 +207,11 @@ export const get_index_for_file = async (file_name: string): Promise<number> => 
   }
 }
 
+/**
+ * Increment the current index for the given file via the File_tracker collection.
+ *  
+ * @param file_name The path to the file to get the index for
+ */
 export const increment_file_tracker_index = async (file_name: string) => {
   try {
     const file_tracker = await File_tracker.findOne({ file_name })
@@ -200,6 +228,11 @@ export const increment_file_tracker_index = async (file_name: string) => {
   }
 }
 
+/**
+ * Get the config document for the journey data or create it if doesn't exist.
+ *  
+ * @returns The config document for the journey data
+ */
 export const get_config = async () => {
   try {
     const config = await Config.findOne({ data_type: "journey" })
@@ -221,14 +254,32 @@ export const get_config = async () => {
   }
 }
 
+/**
+ * Save the journey data to the database.
+ *  
+ * @param data The data to save to the journey collection.
+ * @returns The new journey document 
+ */
 export const save_journey_data = async (data: Journey_data) => {
   const new_journey = new Journey(data)
   return new_journey.save()
 }
 
+/**
+ * The return data from journey table pagination query
+ */
 export interface Journey_query_result {
+  /**
+   * The journeys that were found
+   */
   journeys: Stored_journey_data[]
+  /**
+   * The total number of journeys in the collection
+   */
   total_journeys: number
+  /**
+   * The total number of pages in the collection defined by the limit
+   */
   total_pages: number
 }
 
@@ -247,15 +298,16 @@ const get_journeys_params_schema = Joi.object({
     .required(),
 })
 
-export interface Get_journeys_query_params {
+export interface Pagination_query_params {
   page: string | number
   limit: string | number
   order: "asc" | "desc"
   sort: keyof Stored_journey_data
 }
+
 //Get all journeys with pagination
 export const get_journeys = async (
-  req: Request<{}, {}, {}, Get_journeys_query_params>,
+  req: Request<{}, {}, {}, Pagination_query_params>,
   res: Response
 ) => {
   try {
