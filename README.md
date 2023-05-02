@@ -31,8 +31,6 @@ This application was designed to mainly be run on a linux, WSL or equivalent OS/
   - The production build version: `yarn docker_prod` 
 - Open browser [here](http://localhost:8080/)
 
-**Example MONGO_URI:** `<db_username>:<db_password>@app_database/`
-
 ### Run tests
 - Run all tests: `yarn test`
 - Run frontend tests: `yarn frontend_test`
