@@ -16,11 +16,11 @@ const { config } = require("dotenv")
 config()
 
 import debug from "debug"
-const debugLog = debug("app:server:log")
-const errorLog = debug("app:server:error")
+const debug_log = debug("app:server:log")
+const error_log = debug("app:server:error")
 
 const app = express()
-debugLog("Starting the server")
+debug_log("Starting the server")
 
 app.use(logger("dev"))
 app.use(express.json())
@@ -42,25 +42,25 @@ app.use("/stations", station_router)
 //The datasets will be saved within the repo to ensure that the app will always have data to work with.
 //Incase the HSL server is down or the data is not available, the app will still work.`
 const start_database = async () => {
-  debugLog("Connecting to database")
+  debug_log("Connecting to database")
 
   const mongo_uri = await get_mongo_uri()
 
   await mongoose.connect(mongo_uri)
 
   try {
-    debugLog("Initializing the database")
+    debug_log("Initializing the database")
 
     const journey_import = import_journey_csv_to_database()
     const station_import = import_stations_csv_to_database()
 
     // Don't want to hold up the server from starting while the csv files are being imported
     Promise.all([journey_import, station_import]).then(() => {
-      debugLog("Database initialization complete")
+      debug_log("Database initialization complete")
     })
 
   } catch (error) {
-    errorLog(error)
+    error_log(error)
   }
 }
 
@@ -75,7 +75,7 @@ export const get_mongo_uri = async (): Promise<string> => {
     //If the MONGO_URI is defined, return it
     return process.env.MONGO_URI
   } else {
-    debugLog(
+    debug_log(
       "MONGO_URI is not defined, trying to read it from the MONGO_URI_FILE environment variable"
     )
     //If the MONGO_URI is not defined, try to read it from the MONGO_URI_FILE environment variable
@@ -85,14 +85,14 @@ export const get_mongo_uri = async (): Promise<string> => {
           encoding: "utf-8",
         })
       } catch (error) {
-        errorLog(
+        error_log(
           "MONGO_URI_FILE is defined but the file could not be read, please check that the file exists and that the user has read permissions"
         )
         process.exit(1)
       }
     } else {
       //If the MONGO_URI_FILE is not defined, exit the program
-      errorLog(
+      error_log(
         "MONGO_URI_FILE and MONGO_URI are not defined, please define it via the MONGO_URI environment variable, in the .env file or provide a path to the variable via the MONGO_URI_FILE environment variable"
       )
       process.exit(1)
@@ -101,7 +101,7 @@ export const get_mongo_uri = async (): Promise<string> => {
 }
 
 if (process.env.NODE_ENV === "test") {
-  debugLog("Running in test mode, prevent app from connecting to database")
+  debug_log("Running in test mode, prevent app from connecting to database")
 } else {
   start_database()
 }

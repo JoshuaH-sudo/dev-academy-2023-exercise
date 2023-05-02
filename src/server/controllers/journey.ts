@@ -10,8 +10,8 @@ import debug from "debug"
 import Joi from "joi"
 import Config from "../models/config"
 import File_tracker from "../models/file_tracker"
-const debugLog = debug("app:journey_controller:log")
-const errorLog = debug("app:journey_controller:error")
+const debug_log = debug("app:journey_controller:log")
+const error_log = debug("app:journey_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets")
 const journey_datasets_path = path.join(datasets_path, "journeys")
@@ -19,10 +19,10 @@ const journey_datasets_path = path.join(datasets_path, "journeys")
 //Clear all journeys from the database
 export const clear_journeys = async () => {
   try {
-    debugLog("Clearing journeys from the database")
+    debug_log("Clearing journeys from the database")
     return Journey.deleteMany({})
   } catch (error) {
-    errorLog("Failed to clear journeys :", error)
+    error_log("Failed to clear journeys :", error)
     throw error
   }
 }
@@ -32,7 +32,7 @@ export const import_journey_csv_to_database = async () => {
   const journey_config = await get_config()
 
   if (journey_config.loaded) {
-    debugLog("Journeys have already been loaded, continuing")
+    debug_log("Journeys have already been loaded, continuing")
     return
   }
 
@@ -43,7 +43,7 @@ export const import_journey_csv_to_database = async () => {
     const read_csv_promises: Promise<void>[] = []
     // Loop through all the csv files in the datasets folder
     for (const file of csv_files) {
-      debugLog(`Importing ${file} to the database`)
+      debug_log(`Importing ${file} to the database`)
       const csv_file_path = path.join(journey_datasets_path, file)
 
       await create_file_tracker(csv_file_path)
@@ -55,9 +55,9 @@ export const import_journey_csv_to_database = async () => {
     journey_config.loaded = true
     await journey_config.save()
 
-    debugLog("All journey csv files imported to the database")
+    debug_log("All journey csv files imported to the database")
   } catch (error) {
-    errorLog("Failed to import csv datasets to database :", error)
+    error_log("Failed to import csv datasets to database :", error)
     throw error
   }
 }
@@ -80,7 +80,7 @@ export const create_file_tracker = async (file_name: string) => {
 
     return file_tracker
   } catch (error) {
-    errorLog("Failed to create station config file tracker :", error)
+    error_log("Failed to create station config file tracker :", error)
     throw error
   }
 }
@@ -110,7 +110,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
         const journey_csv_data_validation = csv_journey_schema.validate(record)
         if (journey_csv_data_validation.error) {
           //If the data is not valid, skip this record
-          errorLog(
+          error_log(
             "Invalid journey data found, skipping it",
             journey_csv_data_validation.error
           )
@@ -141,7 +141,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
           duration: parseInt(record["Duration (sec.)"]),
         }
 
-        debugLog(
+        debug_log(
           `Saving journey data to the database: ${results.departure_station_name}`
         )
 
@@ -156,7 +156,7 @@ export const read_csv_journey_data = async (filePath: string): Promise<void> => 
     })
 
     parser.on("skip", async (error) => {
-      errorLog("Skipping journey line in csv file", error.message)
+      error_log("Skipping journey line in csv file", error.message)
       await increment_file_tracker_index(filePath)
     })
 
@@ -179,7 +179,7 @@ export const get_index_for_file = async (file_name: string): Promise<number> => 
 
     return file_tracker.current_line
   } catch (error) {
-    errorLog("Failed to get station config file index :", error)
+    error_log("Failed to get station config file index :", error)
     throw error
   }
 }
@@ -195,7 +195,7 @@ export const increment_file_tracker_index = async (file_name: string) => {
     file_tracker.current_line += 1
     await file_tracker.save()
   } catch (error) {
-    errorLog("Failed to update station config :", error)
+    error_log("Failed to update station config :", error)
     throw error
   }
 }
@@ -205,7 +205,7 @@ export const get_config = async () => {
     const config = await Config.findOne({ data_type: "journey" })
 
     if (!config) {
-      debugLog("Creating new journey config")
+      debug_log("Creating new journey config")
       
       return await new Config({
         data_type: "journey",
@@ -216,7 +216,7 @@ export const get_config = async () => {
 
     return config
   } catch (error) {
-    errorLog("Failed to get journey config :", error)
+    error_log("Failed to get journey config :", error)
     throw error
   }
 }
@@ -273,7 +273,7 @@ export const get_journeys = async (
     })
 
     if (params_validation.error) {
-      errorLog("Invalid params :", params_validation.error)
+      error_log("Invalid params :", params_validation.error)
       return res.status(400).json({
         message: "Invalid query params : " + params_validation.error.message,
       })
@@ -300,7 +300,7 @@ export const get_journeys = async (
 
     res.status(200).json({ journeys, total_journeys, total_pages })
   } catch (error) {
-    errorLog("Failed to get journeys :", error)
+    error_log("Failed to get journeys :", error)
     res.status(500).json({
       message: "Failed to get journeys",
     })

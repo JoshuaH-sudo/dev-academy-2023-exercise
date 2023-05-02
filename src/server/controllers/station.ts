@@ -11,14 +11,14 @@ import debug from "debug"
 import Joi from "joi"
 import Config from "../models/config"
 import File_tracker from "../models/file_tracker"
-const debugLog = debug("app:Station_controller:log")
-const errorLog = debug("app:Station_controller:error")
+const debug_log = debug("app:Station_controller:log")
+const error_log = debug("app:Station_controller:error")
 
 const datasets_path = path.join(__dirname, "../../../", "datasets", "stations")
 
 //Clear all Stations from the database
 export const clear_stations = async () => {
-  debugLog("Clearing Stations from the database")
+  debug_log("Clearing Stations from the database")
   return Station.deleteMany({})
 }
 
@@ -27,7 +27,7 @@ export const import_stations_csv_to_database = async () => {
   const station_config = await get_config()
 
   if (station_config.loaded) {
-    debugLog("Stations have already been loaded, continuing")
+    debug_log("Stations have already been loaded, continuing")
     return
   }
 
@@ -38,7 +38,7 @@ export const import_stations_csv_to_database = async () => {
     const read_csv_promises: Promise<void>[] = []
     //loop through all the csv files in the datasets folder
     for (const file of csv_files) {
-      debugLog(`Importing ${file} to the database`)
+      debug_log(`Importing ${file} to the database`)
       const csv_file_path = path.join(datasets_path, file)
 
       // Add a file tracker to the config for each file that is being imported so the current line can be tracked.
@@ -52,9 +52,9 @@ export const import_stations_csv_to_database = async () => {
     station_config.loaded = true
     await station_config.save()
 
-    debugLog("All station csv files imported to the database")
+    debug_log("All station csv files imported to the database")
   } catch (error) {
-    errorLog("Failed to import csv datasets to database :", error)
+    error_log("Failed to import csv datasets to database :", error)
     throw error
   }
 }
@@ -76,7 +76,7 @@ export const create_file_tracker = async (file_name: string) => {
     
     return config.save()
   } catch (error) {
-    errorLog("Failed to create station config file tracker :", error)
+    error_log("Failed to create station config file tracker :", error)
     throw error
   }
 }
@@ -104,7 +104,7 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
         const Station_csv_data_validation = csv_station_schema.validate(record)
         if (Station_csv_data_validation.error) {
           //If the data is not valid, then log the error and continue.
-          errorLog(`Invalid station data found, skipping it`)
+          error_log(`Invalid station data found, skipping it`)
 
           await increment_file_tracker_index(filePath)
           continue
@@ -138,12 +138,12 @@ export const read_csv_station_data = async (filePath: string): Promise<void> => 
     })
 
     parser.on("skip", async (error) => {
-      errorLog("Skipping station line in csv file", error.message)
+      error_log("Skipping station line in csv file", error.message)
       await increment_file_tracker_index(filePath)
     })
 
     parser.on("error", (error: any) => {
-      errorLog("Error while reading station csv file", error.message)
+      error_log("Error while reading station csv file", error.message)
       reject(error)
     })
 
@@ -162,7 +162,7 @@ export const get_index_for_file = async (file_name: string): Promise<number> => 
 
     return file_tracker.current_line
   } catch (error) {
-    errorLog("Failed to get station config file index :", error)
+    error_log("Failed to get station config file index :", error)
     throw error
   }
 }
@@ -178,7 +178,7 @@ export const increment_file_tracker_index = async (file_name: string) => {
     file_tracker.current_line += 1
     await file_tracker.save()
   } catch (error) {
-    errorLog("Failed to update station config :", error)
+    error_log("Failed to update station config :", error)
     throw error
   }
 }
@@ -188,7 +188,7 @@ export const get_config = async () => {
     const config = await Config.findOne({ data_type: "station" })
 
     if (!config) {
-      debugLog("Creating new station config")
+      debug_log("Creating new station config")
       const station_config = new Config({
         data_type: "station",
         loaded: false,
@@ -200,7 +200,7 @@ export const get_config = async () => {
 
     return config
   } catch (error) {
-    errorLog("Failed to get station config :", error)
+    error_log("Failed to get station config :", error)
     throw error
   }
 }
@@ -249,7 +249,7 @@ export const get_stations = async (
     })
 
     if (params_validation.error) {
-      errorLog("Invalid params :", params_validation.error)
+      error_log("Invalid params :", params_validation.error)
       return res.status(400).json({
         message: "Invalid query params : " + params_validation.error.message,
       })
@@ -277,7 +277,7 @@ export const get_stations = async (
 
     res.status(200).json({ stations, total_stations, total_pages })
   } catch (error) {
-    errorLog("Failed to get stations :", error)
+    error_log("Failed to get stations :", error)
     res.status(500).json({
       message: "Failed to get stations",
     })
@@ -294,7 +294,7 @@ export const get_station = async (req: Request<{ _id: string }>, res: Response) 
     }
     res.status(200).json(station)
   } catch (error) {
-    errorLog("Failed to get station :", error)
+    error_log("Failed to get station :", error)
     res.status(500).json({
       message: "Failed to get station",
     })
@@ -423,7 +423,7 @@ export const get_top_5_return_stations = async (
   station_doc_id: string,
   time_filter: Time_filter
 ) => {
-  debugLog("Getting top 5 return stations for station :", station_doc_id)
+  debug_log("Getting top 5 return stations for station :", station_doc_id)
   return Journey.aggregate<Top_stations>([
     {
       //Find all journeys that have the same departure station id as the given station id
@@ -469,7 +469,7 @@ export const get_top_5_departure_stations = async (
   station_doc_id: string,
   time_filter: Time_filter
 ) => {
-  debugLog("Getting top 5 departure stations for station :", station_doc_id)
+  debug_log("Getting top 5 departure stations for station :", station_doc_id)
   return Journey.aggregate<Top_stations>([
     {
       $match: {
@@ -511,7 +511,7 @@ export const get_average_distance_started = async (
   station_doc_id: string,
   time_filter: Time_filter
 ) => {
-  debugLog("Getting average distance started for station :", station_doc_id)
+  debug_log("Getting average distance started for station :", station_doc_id)
   return Journey.aggregate<average_distance>([
     {
       $match: {
@@ -536,7 +536,7 @@ export const get_average_distance_ended = async (
   station_doc_id: string,
   time_filter: Time_filter
 ) => {
-  debugLog("Getting average distance ended for station :", station_doc_id)
+  debug_log("Getting average distance ended for station :", station_doc_id)
   return Journey.aggregate<average_distance>([
     {
       $match: {
