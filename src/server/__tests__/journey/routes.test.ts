@@ -6,11 +6,6 @@ import Journey from "../../models/journey"
 
 //Testing the routes from an external perspective
 describe("Journey Routes", () => {
-  beforeEach(async () => {
-    // Ensure that app does not call start_database() when testing routes
-    process.env.NODE_ENV = "test"
-  })
-
   it("Should return 200 when getting journeys", async () => {
     //store journey data without _id
     const new_journey = { ...dummy_journey_A, _id: undefined}

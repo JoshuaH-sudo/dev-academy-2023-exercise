@@ -13,7 +13,6 @@ import path from "path"
 import File_tracker from "../../models/file_tracker"
 import fs from "fs"
 import Config from "../../models/config"
-import { delay } from "lodash"
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "journeys")
 const good_journeys_csv_file = path.join(mock_datasets_path, "good_journeys.csv")

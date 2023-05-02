@@ -71,8 +71,6 @@ async function start_database() {
  * @returns The database URI
  */
 export const get_mongo_uri = async (): Promise<string> => {
-  console.log("MONGO_URI" + process.env.MONGO_URI)
-  console.log("MONGO_URI_FILE" + process.env.MONGO_URI_FILE)
   if (process.env.MONGO_URI !== undefined) {
     //If the MONGO_URI is defined, return it
     return process.env.MONGO_URI
@@ -102,7 +100,7 @@ export const get_mongo_uri = async (): Promise<string> => {
   }
 }
 
-if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === undefined) {
+if (process.env.NODE_ENV === "test") {
   debugLog("Running in test mode, prevent app from connecting to database")
 } else {
   start_database()

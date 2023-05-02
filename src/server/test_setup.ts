@@ -5,14 +5,7 @@ beforeAll(async () => {
   await connect_to_database()
 })
 
-// Save old environment variables to reset before each test
-const OLD_ENV = process.env
-
 beforeEach(async () => {
-  // clears the cache
-  jest.resetModules() 
-  // Reset environment variables for index test
-  process.env = { ...OLD_ENV }
   //Ensure there is no data in the database before each test
   await clean_database()
   jest.restoreAllMocks()
