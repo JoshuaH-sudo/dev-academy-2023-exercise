@@ -169,11 +169,11 @@ export const read_csv_journey_data = async (file_path: string): Promise<void> =>
     })
 
     parser.on("skip", async (error) => {
-      error_log("Skipping journey line in csv file", error.message)
       await increment_file_tracker_index(file_path)
     })
 
     parser.on("error", (error: any) => {
+      error_log("Error while reading station csv file", error.message)
       reject(error)
     })
 

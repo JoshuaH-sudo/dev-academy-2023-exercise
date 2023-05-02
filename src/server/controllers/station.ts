@@ -154,7 +154,6 @@ export const read_csv_station_data = async (file_path: string): Promise<void> =>
     })
 
     parser.on("skip", async (error) => {
-      error_log("Skipping station line in csv file", error.message)
       await increment_file_tracker_index(file_path)
     })
 
