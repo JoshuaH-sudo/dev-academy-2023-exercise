@@ -1,5 +1,5 @@
 name: Tests
-run-name: Test Runner
+run-name: Run tests and upload coverage
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   pull_request:
     branches:
       - main
-
+      
 jobs:
   run-tests:
     runs-on: ubuntu-latest

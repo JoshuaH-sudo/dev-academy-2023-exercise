@@ -100,7 +100,7 @@ export const get_mongo_uri = async (): Promise<string> => {
   }
 }
 
-if (process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === undefined) {
   debugLog("Running in test mode, prevent app from connecting to database")
 } else {
   start_database()
