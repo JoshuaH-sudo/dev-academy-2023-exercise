@@ -31,7 +31,7 @@ This application was designed to mainly be run on a linux, WSL or equivalent OS/
   - The full release version on ECS: `yarn docker_release`
 - Open browser [here](http://localhost:8080/)
 
-**Note:** To run the production version, you must set the variables in the `environment/` folder, which will be used as secrets in the stack.
+**Note:** When running the `production` version, you can set the docker secrets in the `environment/` folder, which will be used as secrets in the stack.
 Make sure to remove the, "TEMPLATE.", prefix from the file name.
 
 **Example MONGO_URI:** `<db_username>:<db_password>@app_database/`
