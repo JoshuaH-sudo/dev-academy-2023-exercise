@@ -3,6 +3,18 @@ run-name: build, push and deploy
 
 on:
   push:
+    paths-ignore:
+      - "**.md"
+      - "**__tests__/**"
+      - "**__mocks__/**"
+      - "figma/**"
+      - "environment/**"
+      - "docker/**.dev.yml"
+      - ".eslintrc.json"
+      - ".nvmrc"
+      - ".prettierrc"
+      - ".prettierrc"
+      - ".github/test.yml"
     branches:
       - main
 
