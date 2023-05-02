@@ -1,6 +1,5 @@
 import mongoose from "mongoose"
 
-
 //Making absolutely sure there is no data in the database before any test
 beforeAll(async () => {
   await connect_to_database()
@@ -33,10 +32,8 @@ const clean_database = () => {
 }
 
 export const connect_to_database = () => {
-  // @ts-ignore process env variable is required for the mongoose connect function in index.ts so setting it to the jest-mongodb global variable
-  process.env.MONGO_URI = global.__MONGO_URI__
   // @ts-ignore global variables are provided by environment @shelf/jest-mongodb
-  return mongoose.connect(global.__MONGO_URI__, {dbName: global.__MONGO_DB_NAME__})
+  return mongoose.connect(global.__MONGO_URI__, { dbName: global.__MONGO_DB_NAME__ })
 }
 
 export const disconnect_from_database = (): Promise<void> => {

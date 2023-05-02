@@ -1,4 +1,5 @@
 # Helsinki city bike app (Dev Academy pre-assignment)
+[![Tests](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/tests.yml/badge.svg)](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/tests.yml)
 [![CI/CD](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/cicd.yml/badge.svg)](https://github.com/JoshuaH-sudo/dev-academy-2023-exercise/actions/workflows/cicd.yml)
 [![codecov](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise/branch/main/graph/badge.svg?token=Z1DXOYNLL2)](https://codecov.io/gh/JoshuaH-sudo/dev-academy-2023-exercise)
 

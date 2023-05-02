@@ -17,7 +17,7 @@ import Title_and_address from "./components/Title_and_address"
 import Station_map from "./components/Station_map"
 import Popular_returns from "./components/Popular_returns"
 import Popular_departures from "./components/Popular_departures"
-import _, { set } from "lodash"
+import _ from "lodash"
 import Time_filter from "./components/Time_filter"
 
 interface Single_station_view_props {
@@ -33,7 +33,7 @@ const Single_station_view: FC<Single_station_view_props> = ({
   const [station, set_station] = useState<Stored_station_data>()
   const [station_stats, set_station_stats] = useState<Station_stats>()
 
-  //The year will be hardcoded for 2021 for now
+  //The year will be hardcoded for 2021 for the purpose of this exercise
   const default_start_date = moment().year(2021).startOf("year")
   const default_end_date = moment().year(2021).endOf("year")
 

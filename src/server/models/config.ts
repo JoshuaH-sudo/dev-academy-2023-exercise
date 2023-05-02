@@ -1,22 +1,25 @@
-import Joi from "joi"
 import mongoose from "mongoose"
 
 //Handles the management of the database
 
 const config_schema = new mongoose.Schema({
-  csv_data_is_loaded: Boolean,
+  data_type: {
+    type: String,
+    required: true,
+  },
+  loaded: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+  // This will track the index for each csv file that is imported/ This will allow the app to continue from where it left off if the server is restarted.
+  // And for each file to be imported in parallel.
+  file_index_trackers: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "File_tracker" }],
+    default: [],
+  },
 })
 
 const Config = mongoose.model("Config", config_schema)
-
-//Initialize the config collection if it does not exist
-export async function initialize_config_collection() {
-    const config = await Config.findOne({})
-    if (!config) {
-      const new_config = new Config({ csv_data_is_loaded: false })
-      return await new_config.save()
-    }
-    return config
-}
 
 export default Config
