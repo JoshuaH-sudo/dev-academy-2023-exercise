@@ -21,6 +21,8 @@ This application was designed to mainly be run on a linux, WSL or equivalent OS/
 - Run `MONGO_URI=<mongo_uri> PORT=8080 yarn start`
 - Open browser [here](http://localhost:8080/)
 
+**Note:** Example mongo_uri: `mongodb://localhost:27017/hsl_bike_app`
+
 ### Run docker stack from repo
 - Clone repo
 - Run either (will setup mongo database and run the app):
@@ -28,6 +30,11 @@ This application was designed to mainly be run on a linux, WSL or equivalent OS/
   - The production version: `yarn docker_prod` 
   - The full release version on ECS: `yarn docker_release`
 - Open browser [here](http://localhost:8080/)
+
+**Note:** To run the production version, you must set the variables in the `environment/` folder, which will be used as secrets in the stack.
+Make sure to remove the, "TEMPLATE.", prefix from the file name.
+
+**Example MONGO_URI:** `<db_username>:<db_password>@app_database/`
 
 ### Run tests
 - Run all tests: `yarn test`

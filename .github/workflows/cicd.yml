@@ -4,6 +4,7 @@ run-name: build, push and deploy
 on:
   push:
     paths-ignore:
+      - "**.env"
       - ".github/**"
       - "**.md"
       - "**__tests__/**"
