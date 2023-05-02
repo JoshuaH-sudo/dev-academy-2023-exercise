@@ -67,20 +67,24 @@ export const create_file_tracker = async (file_name: string) => {
     const found_tracker = await File_tracker.findOne({ file_name })
     if (found_tracker) return found_tracker
 
-    const new_file_tracker = new File_tracker({
+    const file_tracker = await new File_tracker({
       file_name,
       current_line: 1,
-    })
-    const file_tracker = await new_file_tracker.save()
+    }).save()
 
     const config = await get_config()
     config.file_index_trackers.push(file_tracker._id)
-    return config.save()
+    // This will ensure that the file_index_trackers array is saved to the database.
+    config.markModified("file_index_trackers")
+    await config.save()
+
+    return file_tracker
   } catch (error) {
     errorLog("Failed to create station config file tracker :", error)
     throw error
   }
 }
+
 export const read_csv_journey_data = async (filePath: string): Promise<void> => {
   const start_line = await get_index_for_file(filePath)
 
@@ -202,13 +206,12 @@ export const get_config = async () => {
 
     if (!config) {
       debugLog("Creating new journey config")
-      const station_config = new Config({
+      
+      return await new Config({
         data_type: "journey",
         loaded: false,
         file_index_tracker: [],
-      })
-
-      return await station_config.save()
+      }).save()
     }
 
     return config

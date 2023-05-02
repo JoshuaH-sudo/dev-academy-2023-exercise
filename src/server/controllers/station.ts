@@ -72,6 +72,8 @@ export const create_file_tracker = async (file_name: string) => {
 
     const config = await get_config()
     config.file_index_trackers.push(file_tracker._id)
+    config.markModified("file_index_trackers")
+    
     return config.save()
   } catch (error) {
     errorLog("Failed to create station config file tracker :", error)

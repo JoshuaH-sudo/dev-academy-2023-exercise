@@ -2,6 +2,7 @@ import {
   clear_stations,
   create_file_tracker,
   get_config,
+  get_index_for_file,
   import_stations_csv_to_database,
   read_csv_station_data,
   save_station_data,
@@ -80,10 +81,59 @@ describe("Station Collection", () => {
       const config = await Config.findOne({ data_type: "station" })
       expect(config).toBeDefined()
     })
+
+    it("Should return a config document if it does exist", async () => {
+      const new_config = new Config({
+        data_type: "station",
+        loaded: true,
+        file_index_trackers: [],
+      })
+      await new_config.save()
+
+      const returned_config = await get_config()
+
+      expect(returned_config).toBeDefined()
+      expect(returned_config._id.toString() === new_config._id.toString()).toBe(true)
+      expect(returned_config?.loaded).toBe(true)
+    })
+  })
+
+  describe("File Tracker", () => {
+    it("Should be appended to file_trackers in config", async () => {
+      await new Config({
+        data_type: "station",
+        loaded: true,
+        file_index_trackers: [],
+      }).save()
+
+      await create_file_tracker(good_stations_csv_file)
+
+      const station_config = await Config.findOne({ data_type: "station" })
+      expect(station_config?.file_index_trackers.length).toBe(1)
+    })
+
+    it("Should return file tracker for file", async () => {
+      await new Config({
+        data_type: "station",
+        loaded: true,
+        file_index_trackers: [],
+      }).save()
+      await create_file_tracker(good_stations_csv_file)
+
+      const file_tracker = await get_index_for_file(good_stations_csv_file)
+
+      expect(file_tracker).toBeDefined()
+    })
+
+    it("Should throw error if cannot find file tracker for file", async () => {
+      expect(get_index_for_file("test.csv")).rejects.toThrowError(
+        "File tracker for test.csv not found"
+      )
+    })
   })
 
   describe("Station CSV Import", () => {
-    it("Should not import if journeys are loaded", async () => {
+    it("Should not import if stations are loaded", async () => {
       await new Config({
         data_type: "station",
         loaded: true,

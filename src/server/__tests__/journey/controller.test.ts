@@ -2,6 +2,7 @@ import {
   clear_journeys,
   create_file_tracker,
   get_config,
+  get_index_for_file,
   import_journey_csv_to_database,
   read_csv_journey_data,
   save_journey_data,
@@ -12,6 +13,7 @@ import path from "path"
 import File_tracker from "../../models/file_tracker"
 import fs from "fs"
 import Config from "../../models/config"
+import { delay } from "lodash"
 
 const mock_datasets_path = path.join(__dirname, "../../../", "__mocks__", "journeys")
 const good_journeys_csv_file = path.join(mock_datasets_path, "good_journeys.csv")
@@ -60,6 +62,55 @@ describe("Journey Collection", () => {
 
       const config = await Config.findOne({ data_type: "journey" })
       expect(config).toBeDefined()
+    })
+
+    it("Should return a config document if it does exist", async () => {
+      const new_config = new Config({
+        data_type: "journey",
+        loaded: true,
+        file_index_trackers: [],
+      })
+      await new_config.save()
+
+      const returned_config = await get_config()
+
+      expect(returned_config).toBeDefined()
+      expect(returned_config._id.toString() === new_config._id.toString()).toBe(true)
+      expect(returned_config?.loaded).toBe(true)
+    })
+  })
+
+  describe("File Tracker", () => {
+    it("Should be appended to file_trackers in config", async () => {
+      await new Config({
+        data_type: "journey",
+        loaded: true,
+        file_index_trackers: [],
+      }).save()
+
+      await create_file_tracker(good_journeys_csv_file)
+
+      const journey_config = await Config.findOne({ data_type: "journey" })
+      expect(journey_config?.file_index_trackers.length).toBe(1)
+    })
+
+    it("Should return file tracker for file", async () => {
+      await new Config({
+        data_type: "journey",
+        loaded: true,
+        file_index_trackers: [],
+      }).save()
+      await create_file_tracker(good_journeys_csv_file)
+
+      const file_tracker = await get_index_for_file(good_journeys_csv_file)
+
+      expect(file_tracker).toBeDefined()
+    })
+
+    it("Should throw error if cannot find file tracker for file", async () => {
+      expect(get_index_for_file("test.csv")).rejects.toThrowError(
+        "File tracker for test.csv not found"
+      )
     })
   })
 
