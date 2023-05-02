@@ -17,7 +17,7 @@ const datasets_path = path.join(__dirname, "../../../", "datasets")
 const journey_datasets_path = path.join(datasets_path, "journeys")
 
 //Clear all journeys from the database
-export async function clear_journeys() {
+export const clear_journeys = async () => {
   try {
     debugLog("Clearing journeys from the database")
     return Journey.deleteMany({})
@@ -28,7 +28,7 @@ export async function clear_journeys() {
 }
 
 //import all the csv files in the datasets folder to the database
-export async function import_journey_csv_to_database() {
+export const import_journey_csv_to_database = async () => {
   const journey_config = await get_config()
 
   if (journey_config.loaded) {
@@ -221,7 +221,7 @@ export const get_config = async () => {
   }
 }
 
-export function save_journey_data(data: Journey_data) {
+export const save_journey_data = async (data: Journey_data) => {
   const new_journey = new Journey(data)
   return new_journey.save()
 }
@@ -254,10 +254,10 @@ export interface Get_journeys_query_params {
   sort: keyof Stored_journey_data
 }
 //Get all journeys with pagination
-export async function get_journeys(
+export const get_journeys = async (
   req: Request<{}, {}, {}, Get_journeys_query_params>,
   res: Response
-) {
+) => {
   try {
     let { page, limit, order, sort } = req.query
 

@@ -17,13 +17,13 @@ const errorLog = debug("app:Station_controller:error")
 const datasets_path = path.join(__dirname, "../../../", "datasets", "stations")
 
 //Clear all Stations from the database
-export async function clear_stations() {
+export const clear_stations = async () => {
   debugLog("Clearing Stations from the database")
   return Station.deleteMany({})
 }
 
 //import all the csv files in the datasets folder to the database
-export async function import_stations_csv_to_database() {
+export const import_stations_csv_to_database = async () => {
   const station_config = await get_config()
 
   if (station_config.loaded) {
@@ -230,10 +230,10 @@ export interface Get_stations_query_params {
   sort: keyof Stored_station_data
 }
 //Get all stations with pagination
-export async function get_stations(
+export const get_stations = async (
   req: Request<{}, {}, {}, Get_stations_query_params>,
   res: Response
-) {
+) => {
   try {
     let { page, limit, order, sort } = req.query
 

@@ -41,7 +41,7 @@ app.use("/stations", station_router)
 //Initialize the database and import csv data if it has not been imported yet.
 //The datasets will be saved within the repo to ensure that the app will always have data to work with.
 //Incase the HSL server is down or the data is not available, the app will still work.`
-async function start_database() {
+const start_database = async () => {
   debugLog("Connecting to database")
 
   const mongo_uri = await get_mongo_uri()
