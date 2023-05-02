@@ -10,7 +10,7 @@ const fake_station_id = "000000000000000000000000"
 //Testing the routes from an external perspective
 //This will ensure that the routes exist and return the correct status codes
 describe("Station Routes", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     // Ensure that app does not call start_database() when testing routes
     process.env.NODE_ENV = "test"
   })
