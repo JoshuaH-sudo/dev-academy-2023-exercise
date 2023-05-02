@@ -45,26 +45,7 @@ docker pull joshuahsudo/hsl_bike_app:latest
 - All required and additional requirements of the exercise.
 - Figma designs for each major UI component.
 - Dockerize application.
-- Switch stations from within the single station view.
+- Switch station views from within the single station view.
 - Jest test suite for both front and backend code, using in-memory test mongoDB.
 - Github action workflow to automate testing.
-
-## Tech-stack, tools and libraries
-### Front-end
-- JS
-- TS
-- React
-- Elastic UI
-
-### Back-end
-- NodeJS
-- ExpressJS
-- MongoDB
-- Mongoose
-
-### Misc
-- Jest
-- Docker
-- Github Actions
-- Figma
-- Yarn
+- Full CI/CD workflow deployment.
