@@ -158,10 +158,6 @@ export const read_csv_journey_data = async (file_path: string): Promise<void> =>
           duration: parseInt(record["Duration (sec.)"]),
         }
 
-        debug_log(
-          `Saving journey data to the database: ${results.departure_station_name}`
-        )
-
         //save the data to the database
         await save_journey_data(results)
         await increment_file_tracker_index(file_path)
