@@ -38,11 +38,6 @@ This application was designed to mainly be run on a linux, WSL or equivalent OS/
   
 *Please note: that there are current problems with mongoDB's support for Ubuntu 22.04 so backend tests may not be runnable see issue [here](https://github.com/nodkz/mongodb-memory-server/issues/732) and [here](https://github.com/shelfio/jest-mongodb/issues/351)*
 
-### [Docker image](https://hub.docker.com/r/joshuahsudo/hsl_bike_app)
-```
-docker pull joshuahsudo/hsl_bike_app:latest
-```
-
 ## Features
 - All required and additional requirements of the exercise.
 - Figma designs for each major UI component.
