@@ -3,6 +3,8 @@ run-name: Run tests and upload coverage
 
 on:
   push:
+    paths: 
+      - "src/**"
     branches:
       - "*" # All branches
   pull_request:
