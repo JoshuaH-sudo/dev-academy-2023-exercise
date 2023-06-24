@@ -8,11 +8,11 @@ services:
       dockerfile: ./docker/dockerfile.dev.yml
     working_dir: /home/node/app
     ports:
-      - "8000:8000"
+      - "8081:8081"
     environment:
-      PORT: 8000
+      PORT: 8081
       NODE_ENV: development
-      MONGO_URI: mongodb://app_database:27017/hsl_bike_app
+      MONGO_URI: mongodb://app_database:27018/hsl_bike_app
     depends_on:
       - app_database
 
@@ -21,7 +21,7 @@ services:
     image: mongo
     restart: always
     ports:
-      - "27000:27000"
+      - "27018:27018"
     volumes:
       - mongo-data:/data/db
 volumes:
