@@ -5,14 +5,11 @@
   "scripts": {
     "type_check": "tsc --noEmit",
     "get_datasets": "./scripts/extract_datasets.sh",
-
     "test": "NODE_ENV=test jest",
     "backend_test": "yarn test --selectProjects backend",
     "frontend_test": "yarn test --selectProjects frontend",
-
     "start": "yarn get_datasets && DEBUG=app* ts-node ./bin/www",
     "build": "./scripts/build.sh",
-
     "dev": "yarn dev_build && yarn start",
     "dev_build": "NODE_ENV=development yarn build",
     "docker_dev_stop": "docker-compose -f ./docker/docker-compose.dev.yml stop",
@@ -20,7 +17,6 @@
     "docker_dev_start": "docker-compose -f ./docker/docker-compose.dev.yml up -d",
     "docker_dev_restart": "yarn docker_dev_stop && yarn docker_dev_start",
     "docker_dev": "yarn type_check && yarn docker_dev_build && yarn docker_dev_restart",
-
     "prod": "yarn prod_build && yarn start",
     "prod_build": "NODE_ENV=production yarn build",
     "docker_prod_stop": "docker-compose -f ./docker/docker-compose.prod.yml stop",
@@ -28,13 +24,11 @@
     "docker_prod_start": "docker-compose -f ./docker/docker-compose.prod.yml up -d",
     "docker_prod_restart": "yarn docker_prod_stop && yarn docker_prod_start",
     "docker_prod": "yarn type_check && yarn docker_prod_build && yarn docker_prod_restart",
-
     "docker_release_stop": "docker-compose -f ./docker/docker-compose.release.yml stop",
     "docker_release_build": "docker-compose -f ./docker/docker-compose.release.yml build --no-cache",
     "docker_release_start": "docker-compose -f ./docker/docker-compose.release.yml up -d",
     "docker_release_restart": "yarn docker_release_stop && yarn docker_release_start",
     "docker_release": "yarn docker_release_build && yarn docker_release_restart",
-
     "docker_push": "docker tag docker-hsl_bike_app joshuahsudo/hsl_bike_app:latest && docker push joshuahsudo/hsl_bike_app:latest",
     "create_esc_definition": "./scripts/create_cloud_formation.sh"
   },
@@ -44,6 +38,7 @@
     "@elastic/eui": "^76.2.0",
     "@emotion/css": "^11.10.6",
     "@emotion/react": "^11.10.6",
+    "@rudderstack/rudder-sdk-node": "^2.0.6",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.0",
     "@types/morgan": "^1.9.4",

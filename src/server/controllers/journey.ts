@@ -11,6 +11,7 @@ import Config from "../models/config"
 import File_tracker from "../models/file_tracker"
 
 import debug from "debug"
+import { rudder_stack_client } from ".."
 const debug_log = debug("app:journey_controller:log")
 const error_log = debug("app:journey_controller:error")
 
@@ -319,6 +320,17 @@ export const get_journeys = async (
       order,
       sort,
     })
+    
+  rudder_stack_client.track({
+    userId: "test-user",
+    event: "get-journeys",
+    properties: {
+      page,
+      limit,
+      order,
+      sort,
+    },
+  })
 
     if (params_validation.error) {
       error_log("Invalid params :", params_validation.error)

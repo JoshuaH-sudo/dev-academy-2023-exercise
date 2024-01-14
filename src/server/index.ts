@@ -106,6 +106,13 @@ if (process.env.NODE_ENV === "test") {
   start_database()
 }
 
+import RudderAnalytics from "@rudderstack/rudder-sdk-node"
+    
+const client = new RudderAnalytics("2avmrp68a1unp9kB6SAiKnTKR1Z", {
+  dataPlaneUrl: "https://smunchjosnxakw.dataplane.rudderstack.com",
+})
+export const rudder_stack_client = client
+
 //Has to be exported like this to allow the bin/www to import app correctly
 module.exports.app = app
 module.exports.start_database = start_database

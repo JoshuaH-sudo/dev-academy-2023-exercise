@@ -12,6 +12,7 @@ import Config from "../models/config"
 import File_tracker from "../models/file_tracker"
 
 import debug from "debug"
+import { rudder_stack_client } from ".."
 const debug_log = debug("app:Station_controller:log")
 const error_log = debug("app:Station_controller:error")
 
@@ -295,6 +296,17 @@ export const get_stations = async (
       limit,
       order,
       sort,
+    })
+
+    rudder_stack_client.track({
+      userId: "test-user",
+      event: "get_stations",
+      properties: {
+        page,
+        limit,
+        order,
+        sort,
+      },
     })
 
     if (params_validation.error) {
